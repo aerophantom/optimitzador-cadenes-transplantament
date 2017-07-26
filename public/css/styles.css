@@ -1,0 +1,144 @@
+.btn:focus, .upload-btn:focus {
+    outline: 0 !important;
+}
+
+html,
+body {
+    height: 100%;
+    background-color: #4791D2;
+}
+
+body {
+    text-align: center;
+}
+
+.panel {
+    -webkit-box-shadow: 3px 3px 10px 2px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 3px 3px 10px 2px rgba(0, 0, 0, 0.75);
+    box-shadow: 3px 3px 10px 2px rgba(0, 0, 0, 0.75);
+}
+
+.row {
+    margin-top: 80px;
+}
+
+.upload-btn, .reset-btn {
+    color: #ffffff;
+    background-color: #F89406;
+    border: none;
+}
+
+.reset-btn {
+    margin-top: 15px;
+}
+
+.upload-btn:hover,
+.upload-btn:focus,
+.upload-btn:active,
+.upload-btn.active,
+.reset-btn:hover,
+.reset-btn:focus,
+.reset-btn:active,
+.reset-btn.active {
+    color: #ffffff;
+    background-color: #FA8900;
+    border: none;
+}
+
+h4 {
+    padding-bottom: 30px;
+    color: #B8BDC1;
+}
+
+.glyphicon {
+    font-size: 5em;
+    color: #9CA3A9;
+}
+
+h2 {
+    margin-top: 15px;
+    color: #68757E;
+}
+
+.panel {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+input.upload-input {
+    display: none;
+}
+
+/* Nuevo código*/
+#data-summary, #data-chains, #llistats, #file-uploader {
+    display: none;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    text-align: left;
+}
+
+#altruistsTable tbody tr, [data-donant-id], [data-receptor-id], [data-prova-encreuada-id], [data-llista] {
+    cursor: pointer;
+}
+
+#altruistsTable tbody tr:hover {
+    background-color: #F89406;
+}
+
+#altruistsTable th, #altruistsTable td {
+    text-align: center;
+}
+
+th.left, td.left {
+    text-align: left;
+}
+
+th.right, td.right {
+    text-align: right;
+}
+
+th.center, td.center {
+    text-align: center;
+}
+
+thead {
+    background: grey;
+    color: white;
+}
+
+tbody tr:nth-child(odd) {
+    background: lightgrey;
+}
+
+table {
+    width: 100%;
+    border: 1px solid grey;
+}
+
+table th, td {
+    text-align: left;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.vermell {
+    color: #d9534f;
+}
+
+.verd {
+    color: #5cb85c;
+}
+
+.transparent {
+    color: transparent;
+}
+
+i.transparent {
+    cursor: inherit;
+}
