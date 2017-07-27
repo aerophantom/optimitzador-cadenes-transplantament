@@ -52,6 +52,7 @@ app.get('/autoload', function (req, res) {
 app.get('/get-chains', function (req, res) {
     var responseData;
 
+
     if (req.query.dadesTimestamp == dadesTimeStamp && loadedData) {
         responseData = {
             status: "success",
@@ -164,7 +165,8 @@ function parseDataFile(ruta) {
         console.error(e);
     }
 
-    fs.unlink(ruta, function () {/* buida per evitar el warning */});
+    fs.unlink(ruta, function () {/* buida per evitar el warning */
+    });
 
     return esCorrecte;
 }
@@ -174,7 +176,7 @@ function parseDataFile(ruta) {
  *
  * @param {Array} ignoreReceptors - Array de receptors a ignorar
  */
-function inicialitzarReceptors(ignoreReceptors) {
+function inicialitzarReceptors(ignoreReceptors, ignoreDonors) {
     R = JSON.parse(JSON.stringify(loadedData.patients));
 
     if (ignoreReceptors) {
@@ -182,6 +184,22 @@ function inicialitzarReceptors(ignoreReceptors) {
             delete R[ignoreReceptors[i]];
         }
     }
+
+    diccionariDonantsAssociats = {};
+
+    if (!ignoreDonors) {
+        return;
+    }
+
+    for (var receptorId in R) {
+        for (var i = 0; i < R[receptorId].related_donors.length; i++) {
+            if (ignoreDonors.indexOf(R[receptorId].related_donors[i]) === -1) {
+                continue;
+            }
+            diccionariDonantsAssociats[R[receptorId].related_donors[i]] = receptorId;
+        }
+    }
+
 }
 
 /**
@@ -194,22 +212,37 @@ function inicialitzarReceptors(ignoreReceptors) {
  * @param {Array} ignoreDonors - Array de donants a ignorar
  */
 function inicialitzarDonants(ignoreDonors) {
+    D = {};
+
     if (ignoreDonors) {
         for (var i = 0; i < ignoreDonors.length; i++) {
             var receptorAssociat = obtenirReceptorAssociat(ignoreDonors[i]);
-            delete R[receptorAssociat];
+
+            if (receptorAssociat) {
+                // Eliminem el donant associat del receptor
+                var donantsAssociatsAlReceptor = R[receptorAssociat].related_donors;
+                var index = donantsAssociatsAlReceptor.indexOf(ignoreDonors[i]);
+                donantsAssociatsAlReceptor.splice(index, 1);
+
+                // Si no hi ha cap donant associat al receptor s'elimina de la llista de receptors
+                if (donantsAssociatsAlReceptor.length === 0) {
+                    delete R[receptorAssociat];
+                    console.log("No queda cap donant associat a ", receptorAssociatcle);
+                }
+
+                console.log("Eliminat donant associat " + ignoreDonors[i] + " de ", receptorAssociat, R[receptorAssociat].related_donors);
+            }
         }
     }
 
-    D = {};
-    diccionariDonantsAssociats = {};
+
     for (var receptorId in R) {
         var donantsCompatibles = R[receptorId].compatible_donors;
 
         for (var i = 0; i < donantsCompatibles.length; i++) {
             var donant = donantsCompatibles[i];
 
-            if (ignoreDonors && ignoreDonors.indexOf(donant) !== -1) { // No s'afegeixen els donants ignorats
+            if (ignoreDonors && ignoreDonors.indexOf(donant.donor) !== -1) { // No s'afegeixen els donants ignorats
                 continue;
             }
 
@@ -220,10 +253,8 @@ function inicialitzarDonants(ignoreDonors) {
             D[donant.donor][receptorId] = donant;
         }
 
-        for (var j = 0; j < R[receptorId].related_donors.length; j++) {
-            diccionariDonantsAssociats[R[receptorId].related_donors[j]] = receptorId;
-        }
     }
+
 }
 
 
@@ -259,9 +290,41 @@ function d(receptorId) {
  * @param {number} receptorId - id del receptor
  * @returns {Object} - diccionari de dades amb els receptors compatibles amb el donant associat.
  */
-function succ(receptorId) {
-    var donantAssociatId = d(receptorId);
-    return succDonant(donantAssociatId);
+// function succ(receptorId) {
+//     var donantAssociatId = d(receptorId);
+//     return succDonant(donantAssociatId);
+// }
+
+function succMultipleDonors(parell) {
+    var donantsAssociats = loadedData.patients[parell.receptor].related_donors;
+
+    var successors = [];
+
+    for (var i = 0; i < donantsAssociats.length; i++) {
+        var auxSuccessors = succDonant(donantsAssociats[i]);
+        for (var j = 0; j < auxSuccessors.length; j++) {
+            successors.push({
+                receptor: auxSuccessors[j],
+                donant: donantsAssociats[i]
+            })
+        }
+    }
+
+    return successors;
+}
+
+function succDonantMultipleDonors(donantId) {
+    var successors = [];
+    var auxSuccessors = succDonant(donantId);
+
+    for (var j = 0; j < auxSuccessors.length; j++) {
+        successors.push({
+            receptor: auxSuccessors[j],
+            donant: donantId
+        })
+    }
+
+    return successors;
 }
 
 
@@ -286,18 +349,18 @@ function succDonant(donantId) {
  * @param {number} receptorJ - id del receptor que rep la donació
  * @returns {number} - probabilitat d'èxit del transplantament
  */
-function sp(receptorI, receptorJ) {
-    var idDonantAssociat = d(receptorI);
-    var probabilitatExit = 0;
-
-    if (!D[idDonantAssociat][receptorJ]) {
-        console.error("El receptor [" + receptorJ + "]no és compatible amb el donant associat a [" + receptorI + "]");
-    } else {
-        probabilitatExit = spDonant(idDonantAssociat, receptorJ);
-    }
-
-    return probabilitatExit;
-}
+// function sp(receptorI, receptorJ) {
+//     var idDonantAssociat = d(receptorI);
+//     var probabilitatExit = 0;
+//
+//     if (!D[idDonantAssociat][receptorJ]) {
+//         console.error("El receptor [" + receptorJ + "]no és compatible amb el donant associat a [" + receptorI + "]");
+//     } else {
+//         probabilitatExit = spDonant(idDonantAssociat, receptorJ);
+//     }
+//
+//     return probabilitatExit;
+// }
 
 /**
  * Retorna la probabilitat d'èxit d'un transplant entre el donant i el receptor passats com argument.
@@ -307,8 +370,10 @@ function sp(receptorI, receptorJ) {
  * @returns {number} - probabilitat d'èxit del transplantament
  */
 function spDonant(donantId, receptorId) {
+    // console.log(donantId, receptorId);
     return 1 - D[donantId][receptorId].failure_prob;
 }
+
 
 /**
  * Retorna la puntuació de transplant entre el donant associat al receptorI i el receptorJ.
@@ -317,9 +382,13 @@ function spDonant(donantId, receptorId) {
  * @param {number} receptorJ - id del receptorJ
  * @returns {number} - puntuació del transplant
  */
-function score(receptorI, receptorJ) {
-    var idDonantAssociat = d(receptorI);
-    return scoreDonant(idDonantAssociat, receptorJ);
+// function score(receptorI, receptorJ) {
+//     var idDonantAssociat = d(receptorI);
+//     return scoreDonant(idDonantAssociat, receptorJ);
+// }
+
+function scoreMultipleDonors(parell) {
+    return scoreDonant(parell.donant, parell.receptor)
 }
 
 
@@ -350,9 +419,20 @@ function scoreDonant(donant, receptor) {
  * @param {Array} conjuntA - array del que s'eliminaran els elements
  * @param {Array} conjuntB - elements a eliminar
  */
-function eliminarElementsDelConjunt(conjuntA, conjuntB) {
-    for (var i = 0; i < conjuntB.length; i++) {
-        eliminarElementDelConjunt(conjuntA, conjuntB[i]);
+// function eliminarElementsDelConjunt(conjuntA, conjuntB) {
+//     for (var i = 0; i < conjuntB.length; i++) {
+//         eliminarElementDelConjunt(conjuntA, conjuntB[i]);
+//     }
+// }
+
+
+function eliminarElementsDelConjuntMultipleDonors(conjuntA, conjuntB) {
+
+    for (var i = 0; i < conjuntA; i++) {
+        var auxCadena = conjuntA[i].receptor + "-" + conjuntA[i].donant;
+        if (conjuntB.indexOf(auxCadena) !== -1) {
+            conjuntA.splice(i, 1);
+        }
     }
 }
 
@@ -375,14 +455,9 @@ function eliminarElementDelConjunt(conjunt, element) {
 
 }
 
-// Retorna un nou conjunt amb els elements de l'array S ordenats pel seu valor corresponent
-// En lloc de retornar el conjunt de receptors es retorna el conjunt de tuples receptor-valor,
-// ja que aquests han d'estar lligats
-
-
 /**
  * Crea un array ordenat de tuples amb la informació corresponent als arrays passats per argument ordenat per
- * val
+ * val.
  *
  * @param {Array} S - array amb les dades a ordenar
  * @param {Array} val - array de valors corresponents a S
@@ -414,9 +489,37 @@ function obtenirConjuntOrdenatPerValor(S, val) {
  * @param {Array} rec_list - array amb els id dels elements a ignorar (els receptors processats anteriorment)
  * @param {number} depth - profunditat a explorar.
  */
-function ExpUt(rec, rec_list, depth) {
-    var S = succ(rec);
-    eliminarElementsDelConjunt(S, rec_list);
+// function ExpUt(rec, rec_list, depth) {
+//     var S = succ(rec);
+//     eliminarElementsDelConjunt(S, rec_list);
+//
+//     // Aquesta es la condició que finalitza la recursió
+//     if (S.length === 0 || depth === 0) {
+//         return 0;
+//     } else {
+//         var val = [];
+//
+//         for (var i = 0; i < S.length; i++) {
+//             var s = S[i];
+//
+//             if (rec_list.indexOf(rec) === -1) {
+//                 rec_list.push(rec); // [rec | rec_list]
+//             }
+//
+//             val.push(ExpUt(s, rec_list, depth - 1) + score(rec, s));
+//
+//         }
+//     }
+//
+//     var T = obtenirConjuntOrdenatPerValor(S, val); // llista d'elements de S ordenats incrementalment pel seu val.
+//     var resultat = sumatoriProbabilitats(rec, T);
+//     return resultat;
+// }
+
+function ExpUtMultipleDonors(rec, rec_list, depth) {
+    var S = succMultipleDonors(rec); // S es el llistat de receptors successors com a tupla a la que s'ha afegit la dada "donant_candidat"
+
+    eliminarElementsDelConjuntMultipleDonors(S, rec_list);
 
     // Aquesta es la condició que finalitza la recursió
     if (S.length === 0 || depth === 0) {
@@ -431,15 +534,15 @@ function ExpUt(rec, rec_list, depth) {
                 rec_list.push(rec); // [rec | rec_list]
             }
 
-            val.push(ExpUt(s, rec_list, depth - 1) + score(rec, s));
-
+            val.push(ExpUtMultipleDonors(s, rec_list, depth - 1) + scoreMultipleDonors(s)); // Només cal passar el receptor perque inclour la referència al donant candidat
         }
     }
 
     var T = obtenirConjuntOrdenatPerValor(S, val); // llista d'elements de S ordenats incrementalment pel seu val.
-    var resultat = sumatoriProbabilitats(rec, T);
+    var resultat = sumatoriProbabilitatsMultipleDonants(T);
     return resultat;
 }
+
 
 /**
  * Sumatori dels valors segons l'algorisme (transparència 32).
@@ -449,15 +552,26 @@ function ExpUt(rec, rec_list, depth) {
  * associat al receptor) i el valor calculat corresponent
  * @returns {number} - valor calculat
  */
-function sumatoriProbabilitats(rec, T) {
+// function sumatoriProbabilitats(rec, T) {
+//     var sumatori = 0;
+//
+//     for (var i = 0; i < T.length; i++) {
+//         sumatori += sp(rec, T[i].receptor) * T[i].valor * productoriProbabilitat(i, rec, T); // Alerta, en la formula es val(ti), estan coordinados por el indice (val[i] corresponde al valor de T[i]
+//     }
+//
+//     return sumatori;
+// }
+
+function sumatoriProbabilitatsMultipleDonants(T) {
     var sumatori = 0;
 
     for (var i = 0; i < T.length; i++) {
-        sumatori += sp(rec, T[i].receptor) * T[i].valor * productoriProbabilitat(i, rec, T); // Alerta, en la formula es val(ti), estan coordinados por el indice (val[i] corresponde al valor de T[i]
+        sumatori += spDonant(T[i].receptor.donant, T[i].receptor.receptor) * T[i].valor * productoriProbabilitatMultipleDonants(i, T); // Alerta, en la formula es val(ti), estan coordinados por el indice (val[i] corresponde al valor de T[i]
     }
 
     return sumatori;
 }
+
 
 /**
  * Productori dels valors segons l'algorisme (transparència 32).
@@ -468,15 +582,26 @@ function sumatoriProbabilitats(rec, T) {
  * associat al receptor) i el valor calculat corresponent
  * @returns {number} - valor calculat
  */
-function productoriProbabilitat(i, rec, T) {
+// function productoriProbabilitat(i, rec, T) {
+//     var productori = 1;
+//
+//     for (var j = i - 1; j > 0; j--) {
+//         productori *= (1 - sp(rec, T[j].receptor));
+//     }
+//
+//     return productori;
+// }
+
+function productoriProbabilitatMultipleDonants(i, T) {
     var productori = 1;
 
-    for (var j = i - 1; j > 0; j--) {
-        productori *= (1 - sp(rec, T[j].receptor));
+    for (var j = i - 1; j >= 0; j--) {
+        productori *= (1 - spDonant(T[j].receptor.donant, T[j].receptor.receptor));
     }
 
     return productori;
 }
+
 
 /**
  * Genera una cadena de transplantament optimitzada a partir d'un donant altruista tenint en compte la profunditat
@@ -494,39 +619,35 @@ function buildChain(depth, altruist, ignoreDonors, ignoreReceptors, resultatsPro
     var no_more_transplantations;
     var cadenaTransplants = [];
 
-    inicialitzarReceptors(ignoreReceptors);
+    inicialitzarReceptors(ignoreReceptors, ignoreDonors);
     inicialitzarDonants(ignoreDonors);
 
     do {
         var S;
         if (current === altruist) {
-            S = succDonant(altruist);
+            S = succDonantMultipleDonors(altruist);
         } else {
-            S = succ(current);
+            S = succMultipleDonors(current);
         }
 
         var val = [];
 
         for (var i = 0; i < S.length; i++) {
-            if (current === altruist) {
-                val.push(ExpUt(S[i], [], depth) + scoreDonant(altruist, S[i]));
-            } else {
-                val.push(ExpUt(S[i], [], depth) + score(current, S[i]));
-            }
+            val.push(ExpUtMultipleDonors(S[i], [], depth) + scoreMultipleDonors(S[i]));
         }
 
         var T = obtenirConjuntOrdenatPerValor(S, val); // llista d'elements de S ordenats incrementalment pel seu val.
         no_more_transplantations = true;
 
         for (i = 0; i < T.length; i++) {
-            var donant = current === altruist ? altruist : d(current);
-            var receptor = T[i].receptor;
+            var donant = current === altruist ? altruist : T[i].receptor.donant;
+            var receptor = T[i].receptor.receptor;
 
             if (provaEncreuada(resultatsProvaEncreuada, donant, receptor)) {
                 // Si el resultat de la prova es positiu no es pot fer el transplant
-
                 eliminarDonantCompatibleDeReceptor(donant, receptor);
                 continue;
+
             } else {
                 var dadesTransplant = {
                     receptor: receptor,
@@ -550,6 +671,66 @@ function buildChain(depth, altruist, ignoreDonors, ignoreReceptors, resultatsPro
     return cadenaTransplants;
 }
 
+// function buildChain(depth, altruist, ignoreDonors, ignoreReceptors, resultatsProvaEncreuada) {
+//     var current = altruist;
+//     var no_more_transplantations;
+//     var cadenaTransplants = [];
+//
+//     inicialitzarReceptors(ignoreReceptors);
+//     inicialitzarDonants(ignoreDonors);
+//
+//     do {
+//         var S;
+//         if (current === altruist) {
+//             S = succDonant(altruist);
+//         } else {
+//             S = succ(current);
+//         }
+//
+//         var val = [];
+//
+//         for (var i = 0; i < S.length; i++) {
+//             if (current === altruist) {
+//                 val.push(ExpUt(S[i], [], depth) + scoreDonant(altruist, S[i]));
+//             } else {
+//                 val.push(ExpUt(S[i], [], depth) + score(current, S[i]));
+//             }
+//         }
+//
+//         var T = obtenirConjuntOrdenatPerValor(S, val); // llista d'elements de S ordenats incrementalment pel seu val.
+//         no_more_transplantations = true;
+//
+//         for (i = 0; i < T.length; i++) {
+//             var donant = current === altruist ? altruist : d(current);
+//             var receptor = T[i].receptor;
+//
+//             if (provaEncreuada(resultatsProvaEncreuada, donant, receptor)) {
+//                 // Si el resultat de la prova es positiu no es pot fer el transplant
+//
+//                 eliminarDonantCompatibleDeReceptor(donant, receptor);
+//                 continue;
+//             } else {
+//                 var dadesTransplant = {
+//                     receptor: receptor,
+//                     donant: donant,
+//                     probExit: spDonant(donant, receptor),
+//                     valor: T[i].valor
+//                 };
+//
+//                 cadenaTransplants.push(dadesTransplant);
+//                 eliminarDonant(dadesTransplant.donant);
+//                 eliminarReceptor(dadesTransplant.receptor);
+//                 current = T[i].receptor;
+//                 no_more_transplantations = false;
+//             }
+//
+//             break;
+//         }
+//
+//     } while (!no_more_transplantations);
+//
+//     return cadenaTransplants;
+// }
 
 /**
  * Retorna el resultat de la prova encreuada pel donant i receptor passats com argument.
@@ -574,7 +755,6 @@ function provaEncreuada(resultatsProva, donant, receptor) {
  * @param {number} receptorId - id del receptor
  */
 function eliminarDonantCompatibleDeReceptor(donantId, receptorId) {
-
     // Eliminem l'assocació del donant amb el receptor
     delete D[donantId][receptorId];
 
@@ -607,7 +787,7 @@ function eliminarDonant(donantId) {
 }
 
 /**
- * Elimina un receptor de la llista de receptors
+ * Elimina un receptor de la llista de receptors i els seus donants associats
  *
  * @param {number} receptorId - id del receptor
  */
