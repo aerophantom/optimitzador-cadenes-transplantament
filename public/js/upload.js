@@ -5,7 +5,8 @@ $(document).ready(function () {
         resultatsProvaEncreuada = [],
         previousDepth,
         previousDonor,
-        dadesTimestamp;
+        dadesTimestamp,
+        chainsDataTable;
 
     /**
      * Inicialitza els detectors d'esdeveniments de l'interficie
@@ -239,6 +240,7 @@ $(document).ready(function () {
         updateChains = function (dades) {
 
             var $tableBody = $('#chainsTable').find('tbody');
+            chainsDataTable.clear();
             $tableBody.html('');
 
             $('#altruistNode').html(previousDonor);
@@ -281,7 +283,7 @@ $(document).ready(function () {
 
                 });
 
-                $tableBody.append($row);
+                chainsDataTable.row.add($row).draw();
             }
 
             $('#data-chains').toggle(true);
@@ -296,6 +298,7 @@ $(document).ready(function () {
          */
         updatePanellProvaEncreuada = function (dades) {
             var $llista = $('#ignora-prova-encreuada tbody');
+
             $llista.html('');
 
             for (var i = 0; i < dades.length; i++) {
@@ -418,11 +421,40 @@ $(document).ready(function () {
             } else {
                 mostrarLoader();
             }
+        },
+
+        /**
+         * Inicialitza les taules que utilitzen la biblioteca DataTable.
+         */
+        inicialitzarTaules = function () {
+            var opcions = {
+                language: {
+                    "sProcessing": "Processant...",
+                    "sLengthMenu": "Mostra _MENU_ registres",
+                    "sZeroRecords": "No s'han trobat registres.",
+                    "sInfo": "Mostrant de _START_ a _END_ de _TOTAL_ registres",
+                    "sInfoEmpty": "Mostrant de 0 a 0 de 0 registres",
+                    "sInfoFiltered": "(filtrat de _MAX_ total registres)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Filtrar:",
+                    "sUrl": "",
+                    "oPaginate": {
+                        "sFirst": "Primer",
+                        "sPrevious": "Anterior",
+                        "sNext": "Següent",
+                        "sLast": "Últim"
+                    }
+                }
+            };
+
+            chainsDataTable = $('#chainsTable').DataTable(opcions);
         };
 
     // En aquesta secció es posa en marxa l'aplicació
     inicialitzarListeners();
+    inicialitzarTaules();
     carregaAutomaticaFitxer();
+
 
 });
 
