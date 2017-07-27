@@ -256,8 +256,8 @@ $(document).ready(function () {
                     "<td class='right'>" + dades.chains[i].receptor +
                     " <i title='Ignorar el receptor: " + dades.chains[i].receptor + "' class='fa fa-times vermell' data-receptor-id='" + dades.chains[i].receptor + "'></i>" +
                     "</td>" +
-                    "<td class='center'>" + dades.chains[i].probExit + "</td>" +
-                    "<td class='right'>" + dades.chains[i].valor.toFixed(2) + "</td>" +
+                    "<td class='center baixa-prioritat'>" + dades.chains[i].probExit + "</td>" +
+                    "<td class='right baixa-prioritat'>" + dades.chains[i].valor.toFixed(2) + "</td>" +
                     "<td class='center vermell'><i title=\"Afegir com a resultat positiu de la prova d'encreuament el parell: " + dades.chains[i].receptor + "-" + dades.chains[i].donant + "\" class='fa fa-plus' data-prova-encreuada-id='" + dades.chains[i].receptor + "-" + dades.chains[i].donant + "'></i></td>" +
                     "</tr>");
 
