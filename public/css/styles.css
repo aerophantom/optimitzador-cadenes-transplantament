@@ -142,3 +142,11 @@ table th, td {
 i.transparent {
     cursor: inherit;
 }
+
+
+/* Extra Small Devices, Phones */
+@media only screen and (max-width : 480px) {
+    .baixa-prioritat {
+        display: none;
+    }
+}
