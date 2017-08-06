@@ -61,7 +61,7 @@
                         <table id="altruistsTable">
                             <thead>
                             <tr>
-                                <th>Pacient ID</th>
+                                <th>Altruista ID</th>
                             </tr>
 
                             </thead>
@@ -99,6 +99,7 @@
                                 <th class="center baixa-prioritat">% èxit</th>
                                 <th class="center baixa-prioritat">Valor</th>
                                 <th class="center">Prova Enc.</th>
+                                <th class="center">Confirmar</th>
                             </tr>
 
                             </thead>
@@ -113,6 +114,27 @@
 
         <div class="col-xs-12 col-md-6">
             <div id="llistats">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h2>Transplants confirmats</h2>
+
+                        <table id="transplants-confirmats">
+                            <thead>
+                            <tr>
+                                <th>Donant</th>
+                                <th>Receptor</th>
+                            </tr>
+
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+
+                        <button class="btn btn-lg reset-btn" data-llista='confirmats' type="button">Restaurar tots</button>
+                    </div>
+                </div>
+
+
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <h2>Llista de receptors descartats</h2>
@@ -190,6 +212,7 @@
 <script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+<script src="js/optimitzador-transplants.js"></script>
 <script src="js/upload.js"></script>
 </body>
 </html>

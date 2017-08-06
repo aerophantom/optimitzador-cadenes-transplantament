@@ -83,7 +83,7 @@ li {
     text-align: left;
 }
 
-#altruistsTable tbody tr, [data-donant-id], [data-receptor-id], [data-prova-encreuada-id], [data-llista] {
+#altruistsTable tbody tr, [data-donant-id], [data-receptor-id], [data-prova-encreuada-id], [data-llista], [data-confirmar-index] {
     cursor: pointer;
 }
 
