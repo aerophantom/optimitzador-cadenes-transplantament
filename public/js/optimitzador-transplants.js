@@ -21,6 +21,7 @@ var OptimitzadorTransplants = function (dades) {
     var diccionariDonantsAssociats; // Relació dels donants associats a cada receptor per optimitzar la cerca inversa
     var llistatDonantsIgnorats;
     var llistatReceptorsIgnorats;
+    var ignorarProbFallada = false;
 
 
     /**
@@ -256,7 +257,12 @@ var OptimitzadorTransplants = function (dades) {
      */
     function spDonant(donantId, receptorId) {
         // console.log(donantId, receptorId);
-        return 1 - D[donantId][receptorId].failure_prob;
+        if (ignorarProbFallada) {
+            console.log("Ignorant prob fallada");
+            return 1;
+        } else {
+            return 1 - D[donantId][receptorId].failure_prob;
+        }
     }
 
 
@@ -717,10 +723,14 @@ var OptimitzadorTransplants = function (dades) {
         return loadedData.patients[receptorId].related_donors;
     }
 
+    function setIgnorarProbFallada(ignorar) {
+        ignorarProbFallada = ignorar;
+    }
+
 
     return {
         buildChain: buildChain,
-
-        getDonantsDeReceptor: getDonantsDeReceptor
+        getDonantsDeReceptor: getDonantsDeReceptor,
+        setIgnorarProbFallada: setIgnorarProbFallada
     };
 };
