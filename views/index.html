@@ -69,6 +69,13 @@
 
                             </tbody>
                         </table>
+
+                        <div class="left form-check">
+                            <label class="form-check-label">
+                                <input id="ignorar-prob-fallada" type="checkbox" class="form-check-input">
+                                Ignorar la probabilitat de fallada
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,40 +84,6 @@
 
 
     <div class="row">
-        <div id="data-chains">
-
-            <div class="col-xs-12 col-md-6">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h2>Cadena de transplant optimitzada</h2>
-
-                        <ul>
-                            <li><strong>Donant altruista:</strong> <span id="altruistNode"></span></li>
-                            <li><strong>Profunditat:</strong> <span id="depthNode"></span></li>
-                        </ul>
-
-
-                        <table id="chainsTable">
-                            <thead>
-                            <tr>
-                                <th class="center">Ordre</th>
-                                <th>Donant</th>
-                                <th>Receptor</th>
-                                <th class="center baixa-prioritat">% èxit</th>
-                                <th class="center baixa-prioritat">Valor</th>
-                                <th class="center">Prova Enc.</th>
-                                <th class="center">Confirmar</th>
-                            </tr>
-
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
 
         <div class="col-xs-12 col-md-6">
             <div id="llistats">
@@ -130,7 +103,8 @@
                             </tbody>
                         </table>
 
-                        <button class="btn btn-lg reset-btn" data-llista='confirmats' type="button">Restaurar tots</button>
+                        <button class="btn btn-lg reset-btn" data-llista='confirmats' type="button">Restaurar tots
+                        </button>
                     </div>
                 </div>
 
@@ -198,6 +172,40 @@
                         </table>
 
                         <button class="btn btn-lg reset-btn" data-llista='proves' type="button">Restaurar tots</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="data-chains">
+
+            <div class="col-xs-12 col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h2>Cadena de transplant optimitzada</h2>
+
+                        <ul>
+                            <li><strong>Donant altruista:</strong> <span id="altruistNode"></span></li>
+                            <li><strong>Profunditat:</strong> <span id="depthNode"></span></li>
+                        </ul>
+
+
+                        <table id="chainsTable">
+                            <thead>
+                            <tr>
+                                <th class="center">Ordre</th>
+                                <th>Donant</th>
+                                <th>Receptor</th>
+                                <th class="center baixa-prioritat">% èxit</th>
+                                <th class="center baixa-prioritat">Valor</th>
+                                <th class="center">Prova Enc.</th>
+                                <th class="center">Conf.</th>
+                            </tr>
+
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

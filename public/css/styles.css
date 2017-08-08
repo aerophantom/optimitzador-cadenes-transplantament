@@ -95,11 +95,11 @@ li {
     text-align: center;
 }
 
-th.left, td.left {
+.form-check.left, th.left, td.left {
     text-align: left;
 }
 
-th.right, td.right {
+.form-check.right, th.right, td.right {
     text-align: right;
 }
 

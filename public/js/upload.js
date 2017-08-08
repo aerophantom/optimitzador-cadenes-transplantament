@@ -189,8 +189,9 @@ $(document).ready(function () {
              * @param {string} resultatProvaEncreuada - parella per la que ha donat positiva la prova encreuada
              */
             loadPatientChain = function (patientId, depth, ignoraDonant, ignoraReceptor, resultatProvaEncreuada) {
+                var ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
+                optimitadorTransplants.setIgnorarProbFallada(ignorarFallada);
 
-                console.log("Ignoradonant?", ignoraDonant);
                 if (ignoraDonant) {
                     ignoraDonants.push(ignoraDonant);
                     updatePanellDonantsIgnorats(ignoraDonants);
@@ -221,7 +222,7 @@ $(document).ready(function () {
                     auxIgnoraReceptors.push(confirmats[i].receptor);
                 }
 
-                var cadena = optimitadorTransplants.buildChain(depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada);
+                var cadena = optimitadorTransplants.buildChain(depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada);
                 updateChains(cadena);
 
 
