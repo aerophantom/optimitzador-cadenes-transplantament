@@ -6,7 +6,6 @@ $(document).ready(function () {
             confirmats = [],
             previousDepth,
             previousDonor,
-            dadesTimestamp,
             chainsDataTable,
             optimitadorTransplants,
             originalAltruists = [],
@@ -71,6 +70,13 @@ $(document).ready(function () {
                 $('.reset-btn').on('click', function () {
                     resetLlista($(this).attr('data-llista'));
                     loadPatientChain(previousDonor, previousDepth);
+                });
+
+                $('#ignorar-prob-fallada').on('change', function() {
+                    if (previousDepth && previousDonor) {
+                        loadPatientChain(previousDonor, previousDepth);
+                    }
+
                 });
             },
 
@@ -137,9 +143,9 @@ $(document).ready(function () {
                     $('#file-uploader').toggle(false);
                     $('#llistats').toggle(false);
                     $('#data-summary').toggle(true);
+                    $('#data-chains').toggle(false);
 
                     optimitadorTransplants = new OptimitzadorTransplants(resposta.data);
-                    dadesTimestamp = resposta.summary.dadesTimestamp;
 
                 } else {
                     alert(resposta.message);
@@ -167,7 +173,23 @@ $(document).ready(function () {
                     $tableBody.append($row);
                     $row.on('click', function () {
                         var patientId = $(this).attr('data-id');
-                        var depth = window.prompt("Introdueix la profunditat per generar la cadena de transplantament: ", "3");
+                        var depth;
+                        var correcte;
+
+                        do {
+                            correcte = true;
+                            depth = window.prompt("Introdueix la profunditat per generar la cadena de transplantament: ", "3");
+
+                            if (isNaN(depth)) {
+                                alert("Error: la profunditat ha de ser un número i ha de ser igual a 1 o superior");
+                                correcte = false;
+                            } else if (depth<1) {
+                                alert("Error: la profunditat mínima ha de ser 1")
+                                correcte = false;
+                            }
+
+                        } while (!correcte);
+
                         loadPatientChain(patientId, depth);
                     });
                 }
@@ -222,9 +244,10 @@ $(document).ready(function () {
                     auxIgnoraReceptors.push(confirmats[i].receptor);
                 }
 
+                $.LoadingOverlay("show");
                 var cadena = optimitadorTransplants.buildChain(depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada);
                 updateChains(cadena);
-
+                $.LoadingOverlay("hide", true);
 
             },
 
