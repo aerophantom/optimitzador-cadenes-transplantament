@@ -30,8 +30,6 @@ var OptimitzadorTransplants = function (dades) {
      * @private
      */
     function inicialitzarReceptors(ignoreReceptors, ignoreDonors) {
-        console.log("Inicialitzant Receptors");
-        console.log("ignoreDonors", ignoreDonors);
         R = JSON.parse(JSON.stringify(loadedData.patients));
 
         if (ignoreReceptors) {
@@ -131,7 +129,6 @@ var OptimitzadorTransplants = function (dades) {
      * @private
      */
     function obtenirReceptorAssociat(donorId) {
-        console.log(diccionariDonantsAssociats[donorId], diccionariDonantsAssociats);
         return diccionariDonantsAssociats[donorId];
     }
 
@@ -236,7 +233,6 @@ var OptimitzadorTransplants = function (dades) {
      * @private
      */
     function spDonant(donantId, receptorId) {
-        // console.log(donantId, receptorId);
         if (ignorarProbFallada) {
             return 1;
         } else {
@@ -266,7 +262,6 @@ var OptimitzadorTransplants = function (dades) {
      * @private
      */
     function scoreDonant(donant, receptor) {
-        // console.log("#scoreDonant", receptorJ);
         var puntuacio;
 
         if (!D[donant][receptor]) {
@@ -287,13 +282,23 @@ var OptimitzadorTransplants = function (dades) {
      * @private
      */
     function eliminarElementsDelConjuntMultipleDonors(conjuntA, conjuntB) {
+        var nouConjunt = [];
+        var eliminar = false;
 
-        for (var i = 0; i < conjuntA; i++) {
-            var auxCadena = conjuntA[i].receptor + "-" + conjuntA[i].donant;
-            if (conjuntB.indexOf(auxCadena) !== -1) {
-                conjuntA.splice(i, 1);
+        for (var i = 0; i < conjuntA.length; i++) {
+            eliminar = false;
+            for (var j=0; j< conjuntB.length; j++) {
+                if (conjuntA[i].receptor == conjuntB[j]) {
+                    eliminar = true;
+                }
+            }
+
+            if (!eliminar) {
+                nouConjunt.push(conjuntA[i]);
             }
         }
+
+        return nouConjunt;
     }
 
 
@@ -335,7 +340,9 @@ var OptimitzadorTransplants = function (dades) {
     function ExpUtMultipleDonors(rec, rec_list, depth) {
         var S = succMultipleDonors(rec); // S es el llistat de receptors successors com a tupla a la que s'ha afegit la dada "donant_candidat"
 
-        eliminarElementsDelConjuntMultipleDonors(S, rec_list);
+        S = eliminarElementsDelConjuntMultipleDonors(S, rec_list);
+        rec_list = rec_list.slice();
+
 
         // Aquesta es la condició que finalitza la recursió
         if (S.length === 0 || depth === 0) {
@@ -343,11 +350,12 @@ var OptimitzadorTransplants = function (dades) {
         } else {
             var val = [];
 
+            var receptor = isNaN(rec) ? rec.receptor : rec;
             for (var i = 0; i < S.length; i++) {
                 var s = S[i];
 
-                if (rec_list.indexOf(rec) === -1) {
-                    rec_list.push(rec); // [rec | rec_list]
+                if (rec_list.indexOf(receptor) === -1) {
+                    rec_list.push(receptor); // [rec | rec_list]
                 }
 
                 val.push(ExpUtMultipleDonors(s, rec_list, depth - 1) + scoreMultipleDonors(s)); // Només cal passar el receptor perque inclour la referència al donant candidat
@@ -374,6 +382,7 @@ var OptimitzadorTransplants = function (dades) {
         for (var i = 0; i < T.length; i++) {
             sumatori += spDonant(T[i].receptor.donant, T[i].receptor.receptor) * T[i].valor * productoriProbabilitatMultipleDonants(i, T); // Alerta, en la formula es val(ti), estan coordinados por el indice (val[i] corresponde al valor de T[i]
         }
+
         return sumatori;
     }
 

@@ -161,7 +161,6 @@ $(document).ready(function () {
              * @param {Array} altruistsData - array de donants altruistes
              */
             updateAltruistsTable = function (altruistsData) {
-                console.log("Original altruists?", originalAltruists);
                 currentAltruists = altruistsData.slice();
 
                 var $tableBody = $('#altruistsTable').find('tbody');
@@ -258,7 +257,6 @@ $(document).ready(function () {
              */
             updateChains = function (dades) {
 
-                console.log("UpdateChains", dades);
                 var $tableBody = $('#chainsTable').find('tbody');
                 chainsDataTable.clear();
                 $tableBody.html('');
@@ -284,14 +282,12 @@ $(document).ready(function () {
 
                     var $donantIcon = $row.find('[data-donant-id]');
                     $donantIcon.on('click', function () {
-                        console.log("Click a donant");
                         var donantId = $(this).attr('data-donant-id');
                         loadPatientChain(previousDonor, previousDepth, donantId)
                     });
 
                     var $receptorIcon = $row.find('[data-receptor-id]');
                     $receptorIcon.on('click', function () {
-                        console.log("Click a receptor");
                         var receptorId = $(this).attr('data-receptor-id');
                         loadPatientChain(previousDonor, previousDepth, null, receptorId);
 
@@ -300,7 +296,6 @@ $(document).ready(function () {
                     var $provaEncreuadaIcon = $row.find('[data-prova-encreuada-id]');
 
                     $provaEncreuadaIcon.on('click', function () {
-                        console.log("Click a prova encreuada");
                         var provaEncreuadaId = $(this).attr('data-prova-encreuada-id');
                         loadPatientChain(previousDonor, previousDepth, null, null, provaEncreuadaId)
 
@@ -499,9 +494,6 @@ $(document).ready(function () {
                         donant: dades[i].donant,
                         receptor: dades[i].receptor
                     });
-
-                    console.log("Afegit a confirmats: ", confirmats[confirmats.length-1]);
-
                 }
 
                 $('#data-chains').toggle(false);
@@ -510,7 +502,6 @@ $(document).ready(function () {
             },
 
             updatePanellTransplantsConfirmats = function (confirmats) {
-                console.log("confirmats", confirmats)
                 var $llista = $('#transplants-confirmats tbody');
 
                 $llista.html('');
