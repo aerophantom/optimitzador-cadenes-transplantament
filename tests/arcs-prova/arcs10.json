@@ -2,12 +2,14 @@
   "origin": "TESTS",
   "description": "Arc de prova amb només 5 receptors i les dades mínimes per provar la aplicació. Els id dels donants altruistes es correspoan amb el codi 1xxx, els receptors amb el codi 2xxx i els donants associats amb el codi 3xxx",
   "altruists": [
-    1000, 1001
+    1000,
+    1001
   ],
   "patients": {
     "2000": {
       "related_donors": [
-        3000, 3001
+        3000,
+        3001
       ],
       "compatible_donors": [
         {
@@ -18,7 +20,7 @@
         {
           "failure_prob": 0.2,
           "score": 38.95,
-          "donor": 3001
+          "donor": 3017
         },
         {
           "failure_prob": 0.1,
@@ -51,7 +53,9 @@
     },
     "2002": {
       "related_donors": [
-        3003, 3004, 3005
+        3003,
+        3004,
+        3005
       ],
       "compatible_donors": [
         {
@@ -62,7 +66,7 @@
         {
           "failure_prob": 0.2,
           "score": 59.59,
-          "donor": 3000
+          "donor": 3015
         },
         {
           "failure_prob": 0.5,
@@ -100,7 +104,8 @@
     },
     "2004": {
       "related_donors": [
-        3007, 3008
+        3007,
+        3008
       ],
       "compatible_donors": [
         {
@@ -117,6 +122,114 @@
           "failure_prob": 0.5,
           "score": 68.23,
           "donor": 3006
+        }
+      ]
+    },
+    "2005": {
+      "related_donors": [
+        3009,
+        3010
+      ],
+      "compatible_donors": [
+        {
+          "failure_prob": 0.15,
+          "score": 13.51,
+          "donor": 3001
+        },
+        {
+          "failure_prob": 0.3,
+          "score": 24.45,
+          "donor": 3012
+        },
+        {
+          "failure_prob": 0.2,
+          "score": 44.13,
+          "donor": 3005
+        }
+      ]
+    },
+    "2006": {
+      "related_donors": [
+        3011,
+        3012,
+        3013
+      ],
+      "compatible_donors": [
+        {
+          "failure_prob": 0.25,
+          "score": 87.23,
+          "donor": 3002
+        },
+        {
+          "failure_prob": 0.15,
+          "score": 33.49,
+          "donor": 3007
+        },
+        {
+          "failure_prob": 0.05,
+          "score": 58.19,
+          "donor": 3014
+        }
+      ]
+    },
+    "2007": {
+      "related_donors": [
+        3014
+      ],
+      "compatible_donors": [
+        {
+          "failure_prob": 0.35,
+          "score": 62.50,
+          "donor": 3002
+        },
+        {
+          "failure_prob": 0.25,
+          "score": 49.33,
+          "donor": 3005
+        },
+        {
+          "failure_prob": 0.15,
+          "score": 92.12,
+          "donor": 3011
+        }
+      ]
+    },
+    "2008": {
+      "related_donors": [
+        3015, 3016
+      ],
+      "compatible_donors": [
+        {
+          "failure_prob": 0.30,
+          "score": 50.32,
+          "donor": 3010
+        },
+        {
+          "failure_prob": 0.20,
+          "score": 33.28,
+          "donor": 3003
+        }
+      ]
+    },
+    "2009": {
+      "related_donors": [
+        3017
+      ],
+      "compatible_donors": [
+        {
+          "failure_prob": 0.05,
+          "score": 40.42,
+          "donor": 3014
+        },
+        {
+          "failure_prob": 0.50,
+          "score": 43.88,
+          "donor": 3002
+        },
+        {
+          "failure_prob": 0.15,
+          "score": 44.19,
+          "donor": 1001
         }
       ]
     }
