@@ -115,7 +115,6 @@ function parseDataFile(ruta) {
     try {
         loadedData = JSON.parse(fs.readFileSync(ruta, 'utf8'));
         esCorrecte = true;
-        dadesTimeStamp = Date.now();
     } catch (e) {
         console.error(e);
     }

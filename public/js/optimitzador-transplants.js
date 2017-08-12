@@ -6,7 +6,7 @@
  * @returns {{buildChain: buildChain}}
  * @constructor
  */
-var OptimitzadorTransplants = function (dades) {
+var OptimitzadorTransplants = function (dades, descendent) {
 
 
     /* ================================================================================================================
@@ -54,9 +54,6 @@ var OptimitzadorTransplants = function (dades) {
                 diccionariDonantsAssociats[R[receptorId].related_donors[i]] = receptorId;
             }
         }
-
-        console.log("Diccionari de donants associats", diccionariDonantsAssociats);
-
 
     }
 
@@ -134,26 +131,11 @@ var OptimitzadorTransplants = function (dades) {
 
 
     /**
-     * Retorna el id del donant associat al receptor passat com argument. En cas de que no es trobi a l'array de receptors
-     * actuals es consultan les dades a la memoria de l'aplicació.
-     *
-     * @param {number} receptorId - id del receptor
-     * @returns {number} - id del donant associat
-     * @private
-     */
-    function d(receptorId) {
-        if (!R[receptorId]) {
-            return loadedData.patients[receptorId].related_donors[0];
-        }
-
-        return R[receptorId].related_donors[0];
-    }
-
-    /**
-     * Retorna un diccionari de dades amb els receptors compatibles amb el donant associat al receptor passat com argument.
+     * Retorna un array de diccionari de dades amb els receptors compatibles amb el donant associat al receptor passat
+     * com argument.
      *
      * @param {Object} parell - tupla que conté la informació d'un donant i un receptor.
-     * @returns {Object} - diccionari de dades amb els receptors compatibles amb el donant associat.
+     * @returns {Array} - array de tuples de dades amb els receptors compatibles amb el donant associat.
      * @private
      */
     function succMultipleDonors(parell) {
@@ -163,7 +145,6 @@ var OptimitzadorTransplants = function (dades) {
         for (var i = 0; i < donantsAssociats.length; i++) {
 
             if (llistatDonantsIgnorats.indexOf(donantsAssociats[i] + "") !== -1) {
-                console.error(donantsAssociats[i], "es troba a la llista de donants ignorats");
                 continue;
             }
 
@@ -182,10 +163,10 @@ var OptimitzadorTransplants = function (dades) {
     }
 
     /**
-     * Retorna un diccionari de dades amb els receptors compatibles amb el donant passat com argument.
+     * Retorna un array de dades amb els receptors compatibles amb el donant passat com argument.
      *
      * @param {int} donantId - identificador del donant
-     * @returns {Object} - diccionari de dades amb els receptors compatibles amb el donant.
+     * @returns {Array} - array de dades amb els receptors compatibles amb el donant.
      * @private
      */
     function succDonantMultipleDonors(donantId) {
@@ -210,16 +191,17 @@ var OptimitzadorTransplants = function (dades) {
 
 
     /**
-     * Retorna un diccionari de dades amb els receptors compatibles amb el donant corresponent al id passat com argument.
+     * Retorna un array amb els identificadors dels receptors compatibles amb el donant corresponent al id passat com
+     * argument.
      *
      * @param {number} donantId - id del donant
-     * @returns {Object} - diccionari de dades amb els receptors compatibles amb el donant.
+     * @returns {Array} - array amb els identificadors dels receptors compatibles amb el donant.
      * @private
      */
     function succDonant(donantId) {
 
         if (donantId === -1 || !D[donantId]) {
-            return {};
+            return [];
         }
         return Object.keys(D[donantId]);
     }
@@ -321,9 +303,17 @@ var OptimitzadorTransplants = function (dades) {
             });
         }
 
+
         T.sort(function (a, b) {
-            return a.valor - b.valor;
+            if (descendent) {
+                return b.valor - a.valor;
+            } else {
+                return a.valor - b.valor;
+            }
+
         });
+
+
 
         return T;
     }
@@ -555,10 +545,6 @@ var OptimitzadorTransplants = function (dades) {
             if (D[donantsCompatibles[i].donor]) {
                 delete D[donantsCompatibles[i].donor][receptorId];
             }
-        }
-
-        if (D[d(receptorId)]) {
-            delete D[d(receptorId)][receptorId];
         }
 
         delete R[receptorId];

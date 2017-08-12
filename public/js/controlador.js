@@ -9,7 +9,8 @@ $(document).ready(function () {
             chainsDataTable,
             optimitadorTransplants,
             originalAltruists = [],
-            currentAltruists = [];
+            currentAltruists = [],
+            descendent = false;
 
         /**
          * Inicialitza els detectors d'esdeveniments de l'interficie
@@ -72,7 +73,7 @@ $(document).ready(function () {
                     loadPatientChain(previousDonor, previousDepth);
                 });
 
-                $('#ignorar-prob-fallada').on('change', function() {
+                $('#ignorar-prob-fallada').on('change', function () {
                     if (previousDepth && previousDonor) {
                         loadPatientChain(previousDonor, previousDepth);
                     }
@@ -145,7 +146,7 @@ $(document).ready(function () {
                     $('#data-summary').toggle(true);
                     $('#data-chains').toggle(false);
 
-                    optimitadorTransplants = new OptimitzadorTransplants(resposta.data);
+                    optimitadorTransplants = new OptimitzadorTransplants(resposta.data, descendent);
 
                 } else {
                     alert(resposta.message);
@@ -182,7 +183,7 @@ $(document).ready(function () {
                             if (isNaN(depth)) {
                                 alert("Error: la profunditat ha de ser un número i ha de ser igual a 1 o superior");
                                 correcte = false;
-                            } else if (depth<1) {
+                            } else if (depth < 1) {
                                 alert("Error: la profunditat mínima ha de ser 1")
                                 correcte = false;
                             }
@@ -443,7 +444,7 @@ $(document).ready(function () {
             autoCarrega = function (resposta) {
                 if (resposta.status === 'success') {
                     updateSummary(resposta);
-                    optimitadorTransplants = new OptimitzadorTransplants(resposta.data);
+                    optimitadorTransplants = new OptimitzadorTransplants(resposta.data, descendent);
                 } else {
                     mostrarLoader();
                 }
@@ -508,7 +509,7 @@ $(document).ready(function () {
 
                 for (var i = 0; i < confirmats.length; i++) {
                     var $row = $('<tr>' +
-                        '<td>' + confirmats[i].donant+ '</td>' +
+                        '<td>' + confirmats[i].donant + '</td>' +
                         '<td>' + confirmats[i].receptor + '</td>' +
                         '</tr>'
                     );
