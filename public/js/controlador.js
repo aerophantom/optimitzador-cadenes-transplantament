@@ -79,6 +79,32 @@ $(document).ready(function () {
                     }
 
                 });
+
+                $(window).resize(function() {
+                    updateChainTableHeaders();
+                });
+            },
+
+            /**
+             * Actualitza les capçaleras de la taula de la cadena de trasnplantaments segons la amplada de la pantalla
+             */
+            updateChainTableHeaders = function() {
+                var width = $(window).width();
+
+                console.log(width);
+
+                var $headers = $('#chainsTable thead tr th');
+
+                if (width<=480) {
+                    $headers.get(0).innerHTML = "O";
+                    $headers.get(1).innerHTML = "D";
+                    $headers.get(2).innerHTML = "R";
+
+                } else {
+                    $headers.get(0).innerHTML = "Ordre";
+                    $headers.get(1).innerHTML = "Donant";
+                    $headers.get(2).innerHTML = "Receptor";
+                }
             },
 
             /**
@@ -269,10 +295,10 @@ $(document).ready(function () {
                 for (var i = 0; i < dades.length; i++) {
                     var $row = $("<tr>" +
                         "<td class='center'>" + (i + 1) + "</td>" +
-                        "<td class='right'>" + dades[i].donant +
+                        "<td class='center'>" + dades[i].donant +
                         " <i title='Ignorar el donant: " + dades[i].donant + "' class='fa fa-times " + (i > 0 ? "vermell" : 'transparent') + "' data-donant-id='" + dades[i].donant + "'></i>" +
                         "</td>" +
-                        "<td class='right'>" + dades[i].receptor +
+                        "<td class='center'>" + dades[i].receptor +
                         " <i title='Ignorar el receptor: " + dades[i].receptor + "' class='fa fa-times vermell' data-receptor-id='" + dades[i].receptor + "'></i>" +
                         "</td>" +
                         "<td class='center baixa-prioritat'>" + dades[i].probExit + "</td>" +
@@ -475,6 +501,8 @@ $(document).ready(function () {
                 };
 
                 chainsDataTable = $('#chainsTable').DataTable(opcions);
+
+                updateChainTableHeaders();
             },
 
             /**
