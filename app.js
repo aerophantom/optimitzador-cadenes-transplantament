@@ -31,7 +31,6 @@ app.get('/autoload', function (req, res) {
                 origin: loadedData.origin,
                 description: loadedData.description ? loadedData.description : 'No s\'ha trobat cap descripció',
                 altruists: loadedData.altruists,
-                dadesTimestamp: dadesTimeStamp
             },
             data: loadedData
         };
@@ -73,7 +72,6 @@ app.post('/upload', function (req, res) {
                         origin: loadedData.origin,
                         description: loadedData.description ? loadedData.description : 'No s\'ha trobat cap descripció',
                         altruists: loadedData.altruists,
-                        dadesTimestamp: dadesTimeStamp
                     },
                     data: loadedData
                 };
