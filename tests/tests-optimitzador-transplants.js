@@ -110,7 +110,6 @@ var OptimitzadorTransplants = function (dades, descendent) {
         }
 
 
-
     }
 
 
@@ -211,6 +210,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
      * @private
      */
     function spDonant(donantId, receptorId) {
+
         if (ignorarProbFallada) {
             return 1;
         } else {
@@ -265,7 +265,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
 
         for (var i = 0; i < conjuntA.length; i++) {
             eliminar = false;
-            for (var j=0; j< conjuntB.length; j++) {
+            for (var j = 0; j < conjuntB.length; j++) {
                 if (conjuntA[i].receptor == conjuntB[j]) {
                     eliminar = true;
                 }
@@ -308,7 +308,6 @@ var OptimitzadorTransplants = function (dades, descendent) {
             }
 
         });
-
 
 
         return T;
@@ -390,7 +389,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
             return productori;
         }
 
-        for (var j=0; j<i; j++) {
+        for (var j = 0; j < i; j++) {
             productori *= (1 - spDonant(T[j].receptor.donant, T[j].receptor.receptor));
         }
 
@@ -554,10 +553,356 @@ var OptimitzadorTransplants = function (dades, descendent) {
         ignorarProbFallada = ignorar;
     }
 
+    // Funcions de prova afegides al codi original
+
+
+    function testInicialitzarReceptors() {
+        inicialitzarReceptors();
+
+        return !!(R[2000] && R[2001] && R[2002] && R[2003] && R[2004]);
+    }
+
+    function testInicialitzarReceptorsIgnorant() {
+        var receptorsIgnorats = [2001, 2002];
+        llistatReceptorsIgnorats = [];
+        inicialitzarReceptors(receptorsIgnorats);
+
+        return !!(R[2000] && !R[2001] && !R[2002] && R[2003] && R[2004]);
+    }
+
+
+    function testInicialitzarDonants() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+
+        return !!(D[1000] && D[1001] && D[3000] && D[3001] && D[3002] && D[3003] && D[3004] && !D[3005] && D[3006]
+        && D[3007] && D[3008]);
+    }
+
+    function testInicialitzarDonantsIgnorant() {
+        var donantsIgnorats = [3000, 3001];
+        llistatDonantsIgnorats = [];
+        inicialitzarReceptors(null, donantsIgnorats);
+        inicialitzarDonants(donantsIgnorats);
+
+        return !!(D[1000] && D[1001] && !D[3000] && !D[3001] && D[3002] && D[3003] && D[3004] && !D[3005] && D[3006]
+        && D[3007] && D[3008]);
+    }
+
+
+    function testEliminarReceptor() {
+        inicialitzarReceptors();
+        eliminarReceptor(2000);
+
+        return !!(!R[2000] && R[2001] && R[2002] && R[2003] && R[2004]);
+    }
+
+    function testEliminarDonant() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+        eliminarDonant(3000);
+
+        return !!(D[1000] && D[1001] && !D[3000] && D[3001] && D[3002] && D[3003] && D[3004] && !D[3005] && D[3006]
+        && D[3007] && D[3008]);
+    }
+
+    function testEliminarDonantCompatibleDeReceptor() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+        eliminarDonantCompatibleDeReceptor(3002, 2000);
+
+        var donantsCompatibles = R[2000].compatible_donors;
+        for (var i = 0; i < donantsCompatibles.length; i++) {
+            if (donantsCompatibles[i].donor == 2000) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function testObtenirSuccessorsDeDonant() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+        var successors = succDonant(3000);
+        return successors.length === 3 && successors.indexOf("2001") !== -1 && successors.indexOf("2002") !== -1 && successors.indexOf("2004") !== -1;
+    }
+
+    function testObtenirSuccessorsDeReceptor() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+        var successors = succMultipleDonors({receptor: 2000});
+
+        var aux = [];
+        for (var i = 0; i < successors.length; i++) {
+            aux.push(successors[i].receptor + '-' + successors[i].donant);
+        }
+
+        return aux.length === 5 &&
+            aux.indexOf("2000-3001") !== -1 &&
+            aux.indexOf("2001-3000") !== -1 &&
+            aux.indexOf("2002-3000") !== -1 &&
+            aux.indexOf("2003-3001") !== -1 &&
+            aux.indexOf("2004-3000") !== -1;
+    }
+
+    function testObtenirProbabilitatExit() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+        return spDonant(3000, 2002) == 0.8;
+    }
+
+    function testObtenirPuntuacio() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+        return scoreMultipleDonors({donant: 3000, receptor: 2002}) === 59.59;
+    }
+
+    function testObtenirReceptorAssociat() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+
+        return obtenirReceptorAssociat(3000) == 2000;
+    }
+
+    function testProvaEncreuadaPositiva() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+
+        return provaEncreuada(["2002-3001"], 3001, 2002);
+    }
+
+    function testProvaEncreuadaNegativa() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+
+        return !provaEncreuada(["2000-3000"], 3001, 2002);
+    }
+
+    function testCalcularSumatori() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+
+        var T = [
+            {receptor: {receptor: 2001, donant: 3000}, valor: 100},  // pf: 0.2
+            {receptor: {receptor: 2002, donant: 3000}, valor: 50},  // pf: 0.2
+            {receptor: {receptor: 2004, donant: 3000}, valor: 10}  // pf: 0.1
+        ];
+
+        var sumatori = sumatoriProbabilitatsMultipleDonants(T);
+
+
+        return sumatori > 88.3599 && sumatori <= 88.36;
+
+    }
+
+    function testCalcularProductori() {
+        inicialitzarReceptors();
+        inicialitzarDonants();
+
+        var T = [
+            {receptor: {receptor: 2001, donant: 3000}},  // pf: 0.2
+            {receptor: {receptor: 2002, donant: 3000}},  // pf: 0.2
+            {receptor: {receptor: 2004, donant: 3000}}  // pf: 0.1
+        ];
+
+        var productori = productoriProbabilitatMultipleDonants(3, T)
+        return productori > 0.0039 && productori <= 0.004;
+    }
+
+    function testConstruirCadena() {
+        var cadena = buildChain(3, 1000);
+
+        return cadena.length === 3 &&
+            cadena[0].receptor == 2000 && cadena[0].donant == 1000 &&
+            cadena[1].receptor == 2003 && cadena[1].donant == 3001 &&
+            cadena[2].receptor == 2004 && cadena[2].donant == 3006;
+    }
+
+    function testConstruirCadenaIgnorantReceptor() {
+        var cadena = buildChain(3, 1000, [], ["2003"]);
+
+        return cadena.length === 2 &&
+            cadena[0].receptor == 2000 && cadena[0].donant == 1000 &&
+            cadena[1].receptor == 2004 && cadena[1].donant == 3000;
+    }
+
+    function testConstruirCadenaIgnorantDonant() {
+        var cadena = buildChain(3, 1000, [3001]);
+
+        return cadena.length === 5 &&
+            cadena[0].receptor == 2000 && cadena[0].donant == 1000 &&
+            cadena[1].receptor == 2002 && cadena[1].donant == 3000 &&
+            cadena[2].receptor == 2001 && cadena[2].donant == 3003 &&
+            cadena[3].receptor == 2004 && cadena[3].donant == 3002 &&
+            cadena[4].receptor == 2003 && cadena[4].donant == 3008;
+    }
+
+    function testConstruirCadenaIgnorantDonantAltruista() {
+        var cadena = buildChain(3, 1000, [1000]);
+
+        return cadena.length === 0;
+    }
+
+    function testConstruirCadenaIgnorantReceptorPrincipal() {
+        var cadena = buildChain(3, 1000, [], ["2000"]);
+
+        return cadena.length === 0;
+    }
+
+    function testConstruirCadenaAmbProvaEncreuada() {
+        var cadena = buildChain(3, 1000, [], [], ["2003-3001"]);
+
+        for (var i=0; i<cadena.length; i++) {
+            if (cadena[i].receptor==2003 && cadena[i].donant == 3001) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Executa la bateria de proves i mostra el resultat per pantalla
+     */
+    function runTests($node) {
+        var tests = [];
+
+        tests.push({
+            descripcio: 'InicialitzarReceptors',
+            resultat: testInicialitzarReceptors()
+        });
+
+        tests.push({
+            descripcio: 'InicialitzarReceptorsIgnorant',
+            resultat: testInicialitzarReceptorsIgnorant()
+        });
+
+        tests.push({
+            descripcio: 'InicialitzarDonants',
+            resultat: testInicialitzarDonants()
+        });
+
+        tests.push({
+            descripcio: 'InicialitzarDonantsIgnorant',
+            resultat: testInicialitzarDonantsIgnorant()
+        });
+
+        tests.push({
+            descripcio: "EliminarReceptor",
+            resultat: testEliminarReceptor()
+        });
+
+        tests.push({
+            descripcio: "EliminarDonant",
+            resultat: testEliminarDonant()
+        });
+
+        tests.push({
+            descripcio: "EliminarDonantCompatibleDeReceptor",
+            resultat: testEliminarDonantCompatibleDeReceptor()
+        });
+
+        tests.push({
+            descripcio: "ObtenirSuccessorsDeDonant",
+            resultat: testObtenirSuccessorsDeDonant()
+        });
+
+        tests.push({
+            descripcio: "ObtenirSuccessorsDeReceptor",
+            resultat: testObtenirSuccessorsDeReceptor()
+        });
+
+        tests.push({
+            descripcio: "ObtenirProbabilitatExit",
+            resultat: testObtenirProbabilitatExit()
+        });
+
+        tests.push({
+            descripcio: "ObtenirPuntuacio",
+            resultat: testObtenirPuntuacio()
+        });
+
+        tests.push({
+            descripcio: "ObtenirReceptorAssociat",
+            resultat: testObtenirReceptorAssociat()
+        });
+
+        tests.push({
+            descripcio: "ProvaEncreuadaPositiva",
+            resultat: testProvaEncreuadaPositiva()
+        });
+
+        tests.push({
+            descripcio: "ProvaEncreuadaNegativa",
+            resultat: testProvaEncreuadaNegativa()
+        });
+
+        tests.push({
+            descripcio: "CalcularSumatori",
+            resultat: testCalcularSumatori()
+        });
+
+        tests.push({
+            descripcio: "CalcularProductori",
+            resultat: testCalcularProductori()
+        });
+
+        tests.push({
+            descripcio: "ConstruirCadena",
+            resultat: testConstruirCadena()
+        });
+
+        tests.push({
+            descripcio: "ConstruirCadenaIgnorantReceptor",
+            resultat: testConstruirCadenaIgnorantReceptor()
+        });
+
+        tests.push({
+            descripcio: "ConstruirCadenaIgnorantReceptor",
+            resultat: testConstruirCadenaIgnorantReceptorPrincipal()
+        });
+
+        tests.push({
+            descripcio: "ConstruirCadenaIgnorantDonant",
+            resultat: testConstruirCadenaIgnorantDonant()
+        });
+
+        tests.push({
+            descripcio: "ConstruirCadenaIgnorantDonantAltruista",
+            resultat: testConstruirCadenaIgnorantDonantAltruista()
+        });
+
+        tests.push({
+            descripcio: "ConstruirCadenaAmbProvaEncreuada",
+            resultat: testConstruirCadenaAmbProvaEncreuada()
+        });
+
+
+        mostrarResultats(tests, $node);
+    }
+
+
+    function mostrarResultats(tests, $node) {
+
+        for (var i = 0; i < tests.length; i++) {
+            var $row = $('<tr>');
+            $row.append('<td class="center">' + (i + 1) + "</td>")
+            $row.append('<td>' + tests[i].descripcio + "</td>")
+
+            if (tests[i].resultat) {
+                $row.append('<td class="center verd"><i class="fa fa-check" aria-hidden="true"></i></td>');
+            } else {
+                $row.append('<td class="center vermell"><i class="fa fa-times" aria-hidden="true"></i></td>');
+            }
+
+
+            $node.append($row);
+        }
+    }
+
 
     return {
-        buildChain: buildChain,
-        getDonantsDeReceptor: getDonantsDeReceptor,
-        setIgnorarProbFallada: setIgnorarProbFallada
+        runTests: runTests
     };
 };
