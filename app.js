@@ -24,6 +24,7 @@ app.get('/autoload', function (req, res) {
 
 
     if (loadedData) {
+        console.log("Enviant resum: ",loadedData.filename);
         // S'ha trobat informació a la memòria
         responseData = {
             status: "success",
@@ -31,6 +32,7 @@ app.get('/autoload', function (req, res) {
                 origin: loadedData.origin,
                 description: loadedData.description ? loadedData.description : 'No s\'ha trobat cap descripció',
                 altruists: loadedData.altruists,
+                filename: loadedData.filename
             },
             data: loadedData
         };
@@ -72,6 +74,7 @@ app.post('/upload', function (req, res) {
                         origin: loadedData.origin,
                         description: loadedData.description ? loadedData.description : 'No s\'ha trobat cap descripció',
                         altruists: loadedData.altruists,
+                        filename: loadedData.filename
                     },
                     data: loadedData
                 };
@@ -112,6 +115,7 @@ function parseDataFile(ruta) {
 
     try {
         loadedData = JSON.parse(fs.readFileSync(ruta, 'utf8'));
+        loadedData.filename = path.basename(ruta);
         esCorrecte = true;
     } catch (e) {
         console.error(e);
@@ -129,7 +133,7 @@ function parseDataFile(ruta) {
  * Aquesta secció inicia l'aplicació com a servidor HTTP.
  *
  * ================================================================================================================ */
-var port = 3000;
+var port = 80;
 var server = app.listen(port, function () {
     console.log('Servidor escoltant al port ' + port);
 });
