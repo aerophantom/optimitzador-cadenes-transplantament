@@ -10,7 +10,7 @@ $(document).ready(function () {
             optimitadorTransplants,
             originalAltruists = [],
             currentAltruists = [],
-            descendent = false;
+            descendent = true;
 
         /**
          * Inicialitza els detectors d'esdeveniments de l'interficie
@@ -91,8 +91,6 @@ $(document).ready(function () {
             updateChainTableHeaders = function() {
                 var width = $(window).width();
 
-                console.log(width);
-
                 var $headers = $('#chainsTable thead tr th');
 
                 if (width<=480) {
@@ -163,6 +161,7 @@ $(document).ready(function () {
                     $('.progress').toggle(false);
                     $('#originNode').html(resposta.summary.origin);
                     $('#descriptionNode').html(resposta.summary.description);
+                    $('#fitxerNode').html(resposta.summary.filename);
 
                     originalAltruists = resposta.summary.altruists;
                     updateAltruistsTable(resposta.summary.altruists.slice());
