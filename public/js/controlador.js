@@ -13,7 +13,7 @@ $(document).ready(function () {
             descendent = true;
 
         /**
-         * Inicialitza els detectors d'esdeveniments de l'interficie
+         * Inicialitza els detectors d'esdeveniments de l'interfície
          */
         var inicialitzarListeners = function () {
                 $('.upload-btn').on('click', function () {
@@ -86,7 +86,7 @@ $(document).ready(function () {
             },
 
             /**
-             * Actualitza les capçaleras de la taula de la cadena de trasnplantaments segons la amplada de la pantalla
+             * Actualitza les capçaleres de la taula de la cadena de trasplantaments segons l'amplada de la pantalla
              */
             updateChainTableHeaders = function() {
                 var width = $(window).width();
@@ -203,7 +203,7 @@ $(document).ready(function () {
 
                         do {
                             correcte = true;
-                            depth = window.prompt("Introdueix la profunditat per generar la cadena de transplantament: ", "3");
+                            depth = window.prompt("Introdueix la profunditat per generar la cadena de trasplantament: ", "3");
 
                             if (isNaN(depth)) {
                                 alert("Error: la profunditat ha de ser un número i ha de ser igual a 1 o superior");
@@ -222,18 +222,18 @@ $(document).ready(function () {
             },
 
             /**
-             * Envia la petició al servidor demanant la cadena de transplantament optimizada pel donant passat com argument
+             * Envia la petició al servidor demanant la cadena de trasplantament optimizada pel donant passat com argument
              * afegint al llistat corresponent el donant ignorat, el receptor ignorat o el resultat positiu de la prova
              * encreuada.
              *
              * La petició tindrà en compte els llistats de donants i receptors ignorats, la profunditat i els resultats de
-             * la prova encreuada, incloent els nous elements passats com argument.
+             * la prova encreuada, incloent-hi els nous elements passats com argument.
              *
              * @param {number} patientId - id del donant
              * @param {number} depth - profunditat a explorar
              * @param {number} ignoraDonant - id del nou donant a ignorar
              * @param {number} ignoraReceptor - id del nou receptor a ignorar
-             * @param {string} resultatProvaEncreuada - parella per la que ha donat positiva la prova encreuada
+             * @param {string} resultatProvaEncreuada - parella per la què ha donat positiva la prova encreuada
              */
             loadPatientChain = function (patientId, depth, ignoraDonant, ignoraReceptor, resultatProvaEncreuada) {
                 var ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
@@ -277,9 +277,9 @@ $(document).ready(function () {
             },
 
             /**
-             * Actualitza la taula de la cadena de transplantament amb les dades retornades pel servidor.
+             * Actualitza la taula de la cadena de trasplantament amb les dades retornades pel servidor.
              *
-             * @param {Object} dades - dades de la cadena de transplantament
+             * @param {Object} dades - dades de la cadena de trasplantament
              */
             updateChains = function (dades) {
 
@@ -437,7 +437,7 @@ $(document).ready(function () {
             },
 
             /**
-             * Mostra la secció de carrega principal.
+             * Mostra la secció de càrrega principal.
              */
             mostrarLoader = function () {
                 $.LoadingOverlay("hide", true);
@@ -505,7 +505,7 @@ $(document).ready(function () {
             },
 
             /**
-             * Confirma els transplants fins a l'index passat com argument, de manera que els donants i receptors passan
+             * Confirma els trasplantaments fins a l'index passat com argument, de manera que els donants i receptors passan
              * a ser ignorats i s'afegeixen els donants associats a l'últim receptor a la llista de donants altruistres.
              */
             confirmarTransplants = function (dades, index) {

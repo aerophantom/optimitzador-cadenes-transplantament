@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
  *
  * Aquesta secció correspon a l'encaminament i accepta les següents rutes:
  *      / (GET)                 - serveix l'index.html
- *      /autoload (GET)         - retorna la informació del contingut de memoria en format JSON
+ *      /autoload (GET)         - retorna la informació del contingut de memòria en format JSON
  *      /upload (POST)          - puja el fitxer per processar i, si és correcte, retorna el resum en format JSON
  *
  * ================================================================================================================ */
@@ -79,7 +79,7 @@ app.post('/upload', function (req, res) {
                     data: loadedData
                 };
             } else {
-                // S'ha produit un error
+                // S'ha produït un error
                 responseData = {
                     status: "error",
                     message: "No s'ha pogut processar el fitxer correctament"

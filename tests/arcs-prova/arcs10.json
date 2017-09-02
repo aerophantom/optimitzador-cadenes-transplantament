@@ -1,6 +1,6 @@
 {
   "origin": "TESTS",
-  "description": "Arc de prova amb només 5 receptors i les dades mínimes per provar la aplicació. Els id dels donants altruistes es correspoan amb el codi 1xxx, els receptors amb el codi 2xxx i els donants associats amb el codi 3xxx",
+  "description": "Graf de compatibilitats de prova amb només 10 receptors i les dades mínimes per provar l'aplicació. Els id dels donants altruistes es corresponen amb el codi 1xxx, els receptors amb el codi 2xxx i els donants associats amb el codi 3xxx",
   "altruists": [
     1000,
     1001
