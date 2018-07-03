@@ -1,13 +1,13 @@
 $(document).ready(function () {
 
-    var ignoraDonants = [],
+    let ignoraDonants = [],
         ignoraReceptors = [],
         resultatsProvaEncreuada = [],
         confirmats = [],
         previousDepth,
         previousDonor,
         chainsDataTable,
-        optimitadorTransplants,
+        optimitzadorTransplants,
         originalAltruists = [],
         currentAltruists = [],
         descendent = true;
@@ -16,23 +16,26 @@ $(document).ready(function () {
      * Inicialitza els detectors d'esdeveniments de l'interfície
      */
     var inicialitzarListeners = function () {
+        let $upload_input = $('.upload-input');
+        let $progress_bar = $('.progress-bar');
+
         $('.upload-btn').on('click', function () {
-            $('.upload-input').val(null);
-            $('.upload-input').click();
+            $upload_input.val(null);
+            $upload_input.click();
             $('.progress').toggle(true);
-            $('.progress-bar').text('0%');
-            $('.progress-bar').width('0%');
+            $progress_bar.text('0%');
+            $progress_bar.width('0%');
         });
 
 
-        $('.upload-input').on('change', function () {
-            var files = $(this).get(0).files;
+        $upload_input.on('change', function () {
+            let files = $(this).get(0).files;
 
             if (files.length > 0) {
-                var formData = new FormData();
+                let formData = new FormData();
 
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
+                for (let i = 0; i < files.length; i++) {
+                    let file = files[i];
                     formData.append('uploads[]', file, file.name);
                 }
 
@@ -45,17 +48,17 @@ $(document).ready(function () {
                     contentType: false,
                     success: updateSummary,
                     xhr: function () {
-                        var xhr = new XMLHttpRequest();
+                        let xhr = new XMLHttpRequest();
 
                         // listen to the 'progress' event
                         xhr.upload.addEventListener('progress', function (evt) {
 
                             if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
+                                let percentComplete = evt.loaded / evt.total;
                                 percentComplete = parseInt(percentComplete * 100);
 
-                                $('.progress-bar').text(percentComplete + '%');
-                                $('.progress-bar').width(percentComplete + '%');
+                                $progress_bar.text(percentComplete + '%');
+                                $progress_bar.width(percentComplete + '%');
 
                                 if (percentComplete === 100) {
                                     $('.progress-bar').html('Fet');
@@ -77,7 +80,6 @@ $(document).ready(function () {
             if (previousDepth && previousDonor) {
                 loadPatientChain(previousDonor, previousDepth);
             }
-
         });
 
         $(window).resize(function() {
@@ -89,16 +91,15 @@ $(document).ready(function () {
      * Actualitza les capçaleres de la taula de la cadena de trasplantaments segons l'amplada de la pantalla
      */
     updateChainTableHeaders = function() {
-        var width = $(window).width();
-
-        var $headers = $('#chainsTable thead tr th');
+        let width = $(window).width();
+        let $headers = $('#chainsTable thead tr th');
 
         if (width<=480) {
             $headers.get(0).innerHTML = "O";
             $headers.get(1).innerHTML = "D";
             $headers.get(2).innerHTML = "R";
-
-        } else {
+        }
+        else {
             $headers.get(0).innerHTML = "Ordre";
             $headers.get(1).innerHTML = "Donant";
             $headers.get(2).innerHTML = "Receptor";
@@ -126,27 +127,22 @@ $(document).ready(function () {
                 resultatsProvaEncreuada = [];
                 updatePanellProvaEncreuada(resultatsProvaEncreuada);
                 break;
-
             case 'receptors':
                 ignoraReceptors = [];
                 updatePanellReceptorsIgnorats(ignoraReceptors);
                 break;
-
             case 'donants':
                 ignoraDonants = [];
                 updatePanellDonantsIgnorats(ignoraDonants);
                 break;
-
             case 'confirmats':
                 confirmats = [];
                 updatePanellTransplantsConfirmats(confirmats);
                 updateAltruistsTable(originalAltruists);
                 $('#data-chains').toggle(false);
                 break;
-
             default:
                 console.error("No s'ha definit el tipus de reset", tipus);
-
         }
     },
 
@@ -171,14 +167,13 @@ $(document).ready(function () {
             $('#data-summary').toggle(true);
             $('#data-chains').toggle(false);
 
-            optimitadorTransplants = new OptimitzadorTransplants(resposta.data, descendent);
-
-        } else {
+            optimitzadorTransplants = new OptimitzadorTransplants(resposta.data, descendent);
+        }
+        else {
             alert(resposta.message);
         }
 
         $.LoadingOverlay("hide", true);
-
     },
 
     /**
@@ -189,17 +184,17 @@ $(document).ready(function () {
     updateAltruistsTable = function (altruistsData) {
         currentAltruists = altruistsData.slice();
 
-        var $tableBody = $('#altruistsTable').find('tbody');
+        let $tableBody = $('#altruistsTable').find('tbody');
 
         $tableBody.html('');
 
-        for (var i = 0; i < altruistsData.length; i++) {
-            var $row = $("<tr data-id='" + altruistsData[i] + "'><td title='Selecciona al donant " + altruistsData[i] + " per iniciar la cadena'>" + altruistsData[i] + "</td></tr>");
+        for (let i = 0; i < altruistsData.length; i++) {
+            let $row = $("<tr data-id='" + altruistsData[i] + "'><td title='Selecciona al donant " + altruistsData[i] + " per iniciar la cadena'>" + altruistsData[i] + "</td></tr>");
             $tableBody.append($row);
             $row.on('click', function () {
-                var patientId = $(this).attr('data-id');
-                var depth;
-                var correcte;
+                let patientId = $(this).attr('data-id');
+                let depth;
+                let correcte;
 
                 do {
                     correcte = true;
@@ -208,17 +203,16 @@ $(document).ready(function () {
                     if (isNaN(depth)) {
                         alert("Error: la profunditat ha de ser un número i ha de ser igual a 1 o superior");
                         correcte = false;
-                    } else if (depth < 1) {
-                        alert("Error: la profunditat mínima ha de ser 1")
+                    }
+                    else if (depth < 1) {
+                        alert("Error: la profunditat mínima ha de ser 1");
                         correcte = false;
                     }
-
                 } while (!correcte);
 
                 loadPatientChain(patientId, depth);
             });
         }
-
     },
 
     /**
@@ -236,19 +230,17 @@ $(document).ready(function () {
      * @param {string} resultatProvaEncreuada - parella per la què ha donat positiva la prova encreuada
      */
     loadPatientChain = function (patientId, depth, ignoraDonant, ignoraReceptor, resultatProvaEncreuada) {
-        var ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
-        optimitadorTransplants.setIgnorarProbFallada(ignorarFallada);
+        let ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
+        optimitzadorTransplants.setIgnorarProbFallada(ignorarFallada);
 
         if (ignoraDonant) {
             ignoraDonants.push(ignoraDonant);
             updatePanellDonantsIgnorats(ignoraDonants);
         }
-
         if (ignoraReceptor) {
             ignoraReceptors.push(ignoraReceptor);
             updatePanellReceptorsIgnorats(ignoraReceptors);
         }
-
         if (resultatProvaEncreuada) {
             resultatsProvaEncreuada.push(resultatProvaEncreuada);
             updatePanellProvaEncreuada(resultatsProvaEncreuada);
@@ -259,21 +251,19 @@ $(document).ready(function () {
 
         $.LoadingOverlay("show");
 
-
         // Creem una copia dels arrays de donants i receptors ignorats per no modificar els originals
-        var auxIgnoraDonants = ignoraDonants.slice();
-        var auxIgnoraReceptors = ignoraReceptors.slice();
+        let auxIgnoraDonants = ignoraDonants.slice();
+        let auxIgnoraReceptors = ignoraReceptors.slice();
 
-        for (var i = 0; i < confirmats.length; i++) {
+        for (let i = 0; i < confirmats.length; i++) {
             auxIgnoraDonants.push(confirmats[i].donant);
             auxIgnoraReceptors.push(confirmats[i].receptor);
         }
 
         $.LoadingOverlay("show");
-        var cadena = optimitadorTransplants.buildChain(depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada);
+        let cadena = optimitzadorTransplants.buildChain(depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada);
         updateChains(cadena);
         $.LoadingOverlay("hide", true);
-
     },
 
     /**
@@ -282,8 +272,8 @@ $(document).ready(function () {
      * @param {Object} dades - dades de la cadena de trasplantament
      */
     updateChains = function (dades) {
+        let $tableBody = $('#chainsTable').find('tbody');
 
-        var $tableBody = $('#chainsTable').find('tbody');
         chainsDataTable.clear();
         $tableBody.html('');
 
@@ -291,8 +281,8 @@ $(document).ready(function () {
         $('#depthNode').html(previousDepth);
 
 
-        for (var i = 0; i < dades.length; i++) {
-            var $row = $("<tr>" +
+        for (let i = 0; i < dades.length; i++) {
+            let $row = $("<tr>" +
                 "<td class='center'>" + (i + 1) + "</td>" +
                 "<td class='center'>" + dades[i].donant +
                 " <i title='Ignorar el donant: " + dades[i].donant + "' class='fa fa-times " + (i > 0 ? "vermell" : 'transparent') + "' data-donant-id='" + dades[i].donant + "'></i>" +
@@ -306,30 +296,28 @@ $(document).ready(function () {
                 "<td class='center verd'><i title=\"Confirmar transplant\" class='fa fa-lock' data-confirmar-index='" + i + "'></i></td>" +
                 "</tr>");
 
-            var $donantIcon = $row.find('[data-donant-id]');
+            let $donantIcon = $row.find('[data-donant-id]');
             $donantIcon.on('click', function () {
-                var donantId = $(this).attr('data-donant-id');
+                let donantId = $(this).attr('data-donant-id');
                 loadPatientChain(previousDonor, previousDepth, donantId)
             });
 
-            var $receptorIcon = $row.find('[data-receptor-id]');
+            let $receptorIcon = $row.find('[data-receptor-id]');
             $receptorIcon.on('click', function () {
-                var receptorId = $(this).attr('data-receptor-id');
+                let receptorId = $(this).attr('data-receptor-id');
                 loadPatientChain(previousDonor, previousDepth, null, receptorId);
-
             });
 
-            var $provaEncreuadaIcon = $row.find('[data-prova-encreuada-id]');
+            let $provaEncreuadaIcon = $row.find('[data-prova-encreuada-id]');
 
             $provaEncreuadaIcon.on('click', function () {
-                var provaEncreuadaId = $(this).attr('data-prova-encreuada-id');
+                let provaEncreuadaId = $(this).attr('data-prova-encreuada-id');
                 loadPatientChain(previousDonor, previousDepth, null, null, provaEncreuadaId)
-
             });
 
-            var $confirmarIcon = $row.find('[data-confirmar-index]');
+            let $confirmarIcon = $row.find('[data-confirmar-index]');
             $confirmarIcon.on('click', function () {
-                var index = $(this).attr('data-confirmar-index');
+                let index = $(this).attr('data-confirmar-index');
                 confirmarTransplants(dades, index);
             });
 
@@ -347,13 +335,12 @@ $(document).ready(function () {
      * @param {Array} dades - array de parelles receptor-donant que han donat positiu en la prova encreuada.
      */
     updatePanellProvaEncreuada = function (dades) {
-        var $llista = $('#ignora-prova-encreuada tbody');
-
+        let $llista = $('#ignora-prova-encreuada tbody');
         $llista.html('');
 
-        for (var i = 0; i < dades.length; i++) {
-            var parell = dades[i].split('-');
-            var $row = $('<tr>' +
+        for (let i = 0; i < dades.length; i++) {
+            let parell = dades[i].split('-');
+            let $row = $('<tr>' +
                 '<td>' + parell[0] + '</td>' +
                 '<td>' + parell[1] + '</td>' +
                 '<td class="center"><i title="Anula el resultat positiu de la prova encreuada per : ' +
@@ -363,10 +350,10 @@ $(document).ready(function () {
 
             $llista.append($row);
 
-            var $icon = $row.find('[data-prova-id]');
+            let $icon = $row.find('[data-prova-id]');
             $icon.on('click', function () {
-                var parell = $(this).attr('data-prova-id');
-                var index = dades.indexOf(parell);
+                let parell = $(this).attr('data-prova-id');
+                let index = dades.indexOf(parell);
                 dades.splice(index, 1);
                 updatePanellProvaEncreuada(dades);
                 loadPatientChain(previousDonor, previousDepth);
@@ -380,12 +367,11 @@ $(document).ready(function () {
      * @param {Array} dades - array amb els id dels receptors ignorats
      */
     updatePanellReceptorsIgnorats = function (dades) {
-        var $llista = $('#ignora-receptors tbody');
+        let $llista = $('#ignora-receptors tbody');
         $llista.html('');
 
-        for (var i = 0; i < dades.length; i++) {
-
-            var $row = $('<tr>' +
+        for (let i = 0; i < dades.length; i++) {
+            let $row = $('<tr>' +
                 '<td>' + dades[i] + '</td>' +
                 '<td class="center"><i title="Restaura el receptor: ' + dades[i] +
                 '" class="fa fa-undo verd" data-receptor-id="' + dades[i] + '"></i></td>' +
@@ -394,15 +380,14 @@ $(document).ready(function () {
 
             $llista.append($row);
 
-            var $icon = $row.find('[data-receptor-id]');
+            let $icon = $row.find('[data-receptor-id]');
             $icon.on('click', function () {
-                var parell = $(this).attr('data-receptor-id');
-                var index = dades.indexOf(parell);
+                let parell = $(this).attr('data-receptor-id');
+                let index = dades.indexOf(parell);
                 dades.splice(index, 1);
                 updatePanellReceptorsIgnorats(dades);
                 loadPatientChain(previousDonor, previousDepth);
             });
-
         }
     },
 
@@ -412,28 +397,26 @@ $(document).ready(function () {
      * @param {Array} dades - array amb els id dels donants ignorats
      */
     updatePanellDonantsIgnorats = function (dades) {
-        var $llista = $('#ignora-donants tbody');
+        let $llista = $('#ignora-donants tbody');
         $llista.html('');
 
-        for (var i = 0; i < dades.length; i++) {
-            var $row = $('<tr>' +
+        for (let i = 0; i < dades.length; i++) {
+            let $row = $('<tr>' +
                 '<td>' + dades[i] + '</td>' +
                 '<td class="center"><i title="Restaura el donant: ' + dades[i] + '" class="fa fa-undo verd" data-donant-id="' + dades[i] + '"></i></td>' +
                 +'</tr>'
             );
             $llista.append($row)
 
-            var $icon = $row.find('[data-donant-id]');
+            let $icon = $row.find('[data-donant-id]');
             $icon.on('click', function () {
-                var parell = $(this).attr('data-donant-id');
-                var index = dades.indexOf(parell);
+                let parell = $(this).attr('data-donant-id');
+                let index = dades.indexOf(parell);
                 dades.splice(index, 1);
                 updatePanellDonantsIgnorats(dades);
                 loadPatientChain(previousDonor, previousDepth);
             });
         }
-
-
     },
 
     /**
@@ -469,8 +452,9 @@ $(document).ready(function () {
     autoCarrega = function (resposta) {
         if (resposta.status === 'success') {
             updateSummary(resposta);
-            optimitadorTransplants = new OptimitzadorTransplants(resposta.data, descendent);
-        } else {
+            optimitzadorTransplants = new OptimitzadorTransplants(resposta.data, descendent);
+        }
+        else {
             mostrarLoader();
         }
     },
@@ -479,7 +463,7 @@ $(document).ready(function () {
      * Inicialitza les taules que utilitzen la biblioteca DataTable.
      */
     inicialitzarTaules = function () {
-        var opcions = {
+        let opcions = {
             language: {
                 "sProcessing": "Processant...",
                 "sLengthMenu": "Mostra _MENU_ registres",
@@ -498,9 +482,7 @@ $(document).ready(function () {
                 }
             }
         };
-
         chainsDataTable = $('#chainsTable').DataTable(opcions);
-
         updateChainTableHeaders();
     },
 
@@ -509,15 +491,15 @@ $(document).ready(function () {
      * a ser ignorats i s'afegeixen els donants associats a l'últim receptor a la llista de donants altruistres.
      */
     confirmarTransplants = function (dades, index) {
-        var donantsAssociats = optimitadorTransplants.getDonantsDeReceptor(dades[index].receptor); // Donants associats a l'últim pacient, que correspon amb l'index
-        var altruistaActual = Number(dades[0].donant);
-        var indexAltruistaActual = currentAltruists.indexOf(altruistaActual);
+        let donantsAssociats = optimitzadorTransplants.getDonantsDeReceptor(dades[index].receptor); // Donants associats a l'últim pacient, que correspon amb l'index
+        let altruistaActual = Number(dades[0].donant);
+        let indexAltruistaActual = currentAltruists.indexOf(altruistaActual);
         currentAltruists.splice(indexAltruistaActual, 1);
         currentAltruists = currentAltruists.concat(donantsAssociats);
 
         updateAltruistsTable(currentAltruists);
 
-        for (var i = 0; i <= index; i++) {
+        for (let i = 0; i <= index; i++) {
             confirmats.push({
                 donant: dades[i].donant,
                 receptor: dades[i].receptor
