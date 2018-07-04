@@ -27,6 +27,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
      * argument.
      *
      * @param {Array} ignoreReceptors - Array de receptors a ignorar
+     * @param {Array} ignoreDonors - Array de donants a ignorar
      * @private
      */
     function inicialitzarReceptors(ignoreReceptors, ignoreDonors) {
@@ -302,7 +303,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
         if (S.length === 0 || depth === 0) {
             return 0;
         } else {
-            var val = [];
+            let val = [];
 
             let receptor = isNaN(rec) ? rec.receptor : rec;
             for (let i = 0; i < S.length; i++) {
@@ -314,10 +315,9 @@ var OptimitzadorTransplants = function (dades, descendent) {
 
                 val.push(ExpUtMultipleDonors(s, rec_list, depth - 1) + scoreMultipleDonors(s)); // Només cal passar el receptor perquè inclou la referència al donant candidat
             }
+            let T = obtenirConjuntOrdenatPerValor(S, val); // Llista d'elements de S ordenats incrementalment pel seu val.
+            return sumatoriProbabilitatsMultipleDonants(T);
         }
-
-        let T = obtenirConjuntOrdenatPerValor(S, val); // Llista d'elements de S ordenats incrementalment pel seu val.
-        return sumatoriProbabilitatsMultipleDonants(T);
     }
 
     /**
