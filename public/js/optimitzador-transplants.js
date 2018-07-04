@@ -368,10 +368,11 @@ var OptimitzadorTransplants = function (dades, descendent) {
      * @param {Array} ignoreReceptors - array de id de receptors a ignorar
      * @param resultatsProvaEncreuada - array de cadenes de text amb les parelles de la prova encreuada que han donat
      * positiu
+     * @param {boolean} ignorarFallada - indica si es ignora la probabilitat de fallada.
      * @returns {Array} - array de tuples amb les dades de trasplantament.
      * @public
      */
-    function buildChain(depth, altruist, ignoreDonors, ignoreReceptors, resultatsProvaEncreuada) {
+    function buildChain(depth, altruist, ignoreDonors, ignoreReceptors, resultatsProvaEncreuada, ignorarFallada) {
         let current = altruist;
         let no_more_transplantations;
         let cadenaTransplants = [];
@@ -381,6 +382,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
 
         inicialitzarReceptors(ignoreReceptors, ignoreDonors);
         inicialitzarDonants(ignoreDonors);
+        setIgnorarProbFallada(ignorarFallada);
 
         do {
             let S;
@@ -516,7 +518,6 @@ var OptimitzadorTransplants = function (dades, descendent) {
 
     return {
         buildChain: buildChain,
-        getDonantsDeReceptor: getDonantsDeReceptor,
-        setIgnorarProbFallada: setIgnorarProbFallada
+        getDonantsDeReceptor: getDonantsDeReceptor
     };
 };

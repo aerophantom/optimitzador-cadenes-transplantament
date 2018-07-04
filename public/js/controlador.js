@@ -231,7 +231,6 @@ $(document).ready(function () {
      */
     loadPatientChain = function (patientId, depth, ignoraDonant, ignoraReceptor, resultatProvaEncreuada) {
         let ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
-        optimitzadorTransplants.setIgnorarProbFallada(ignorarFallada);
 
         if (ignoraDonant) {
             ignoraDonants.push(ignoraDonant);
@@ -261,7 +260,9 @@ $(document).ready(function () {
         }
 
         $.LoadingOverlay("show");
-        let cadena = optimitzadorTransplants.buildChain(depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada);
+        let cadena = optimitzadorTransplants.buildChain(
+            depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada
+        );
         updateChains(cadena);
         $.LoadingOverlay("hide", true);
     },
@@ -406,7 +407,7 @@ $(document).ready(function () {
                 '<td class="center"><i title="Restaura el donant: ' + dades[i] + '" class="fa fa-undo verd" data-donant-id="' + dades[i] + '"></i></td>' +
                 +'</tr>'
             );
-            $llista.append($row)
+            $llista.append($row);
 
             let $icon = $row.find('[data-donant-id]');
             $icon.on('click', function () {
