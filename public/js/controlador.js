@@ -225,9 +225,9 @@ $(document).ready(function () {
      *
      * @param {number} patientId - id del donant
      * @param {number} depth - profunditat a explorar
-     * @param {number} ignoraDonant - id del nou donant a ignorar
-     * @param {number} ignoraReceptor - id del nou receptor a ignorar
-     * @param {string} resultatProvaEncreuada - parella per la què ha donat positiva la prova encreuada
+     * @param {number} [ignoraDonant] - id del nou donant a ignorar
+     * @param {number} [ignoraReceptor] - id del nou receptor a ignorar
+     * @param {string} [resultatProvaEncreuada] - parella per la què ha donat positiva la prova encreuada
      */
     loadPatientChain = function (patientId, depth, ignoraDonant, ignoraReceptor, resultatProvaEncreuada) {
         let ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
