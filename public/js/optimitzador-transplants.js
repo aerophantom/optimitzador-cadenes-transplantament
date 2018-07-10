@@ -521,3 +521,4 @@ var OptimitzadorTransplants = function (dades, descendent) {
         getDonantsDeReceptor: getDonantsDeReceptor
     };
 };
+exports.OptimitzadorTransplantsLib = OptimitzadorTransplants;
