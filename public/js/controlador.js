@@ -10,6 +10,7 @@ $(document).ready(function () {
         optimitzadorTransplants,
         originalAltruists = [],
         currentAltruists = [],
+        serverSide = false,
         descendent = true;
 
     /**
@@ -25,8 +26,8 @@ $(document).ready(function () {
             $('.progress').toggle(true);
             $progress_bar.text('0%');
             $progress_bar.width('0%');
+            serverSide = $('#server-side').is(":checked");
         });
-
 
         $upload_input.on('change', function () {
             let files = $(this).get(0).files;
@@ -254,17 +255,45 @@ $(document).ready(function () {
         let auxIgnoraDonants = ignoraDonants.slice();
         let auxIgnoraReceptors = ignoraReceptors.slice();
 
+        // esta copia no es necesaria si se hace en el servidor - mejora pequeña
         for (let i = 0; i < confirmats.length; i++) {
             auxIgnoraDonants.push(confirmats[i].donant);
             auxIgnoraReceptors.push(confirmats[i].receptor);
         }
+        if (serverSide){
+            let body = {
+                "profunditat": depth,
+                "pacient": patientId,
+                "donantsIgnorats": auxIgnoraDonants,
+                "receptorsIgnorats": auxIgnoraReceptors,
+                "provesEncreuades": resultatsProvaEncreuada,
+                "ignorarFallada": ignorarFallada
+            };
+            $.LoadingOverlay("show");
+            $.ajax({
+                url: '/cadena-trasplantaments',
+                type: 'PUT',
+                data: JSON.stringify(body),
+                dataType: 'json',
+                processData: false,
+                contentType: 'application/json',
+                success: chainFromServer
+            });
+        }
+        else{
+            let cadena = optimitzadorTransplants.buildChain(
+                depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada
+            );
+            updateChains(cadena);
+            $.LoadingOverlay("hide", true);
+        }
+    },
 
-        $.LoadingOverlay("show");
-        let cadena = optimitzadorTransplants.buildChain(
-            depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada
-        );
-        updateChains(cadena);
-        $.LoadingOverlay("hide", true);
+    chainFromServer = function(response){
+        if (response.status === "success"){
+            updateChains(response.trasplantaments);
+            $.LoadingOverlay("hide", true);
+        }
     },
 
     /**
