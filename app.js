@@ -16,7 +16,6 @@ app.use(express.static(path.join(__dirname, 'public')));
  * La documentació de l'API es pot trobar a: https://app.apiary.io/trasplantaments
  * Aquesta secció correspon a l'encaminament i accepta les següents rutes:
  *      /                           (GET)   → serveix l'index.html
- *      /autoload                   (GET)   → retorna la informació del contingut de memòria en format JSON
  *      /upload                     (POST)  → puja el fitxer per processar i, si és correcte, retorna el resum en format JSON
  *
  *      Per executar codi al servidor:
@@ -26,83 +25,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'views/index.html'));
-});
-
-app.get('/autoload', function (req, res) {
-    let responseData;
-
-    if (loadedData) {
-        console.log("Enviant resum: ",loadedData.filename);
-        // S'ha trobat informació a la memòria
-        responseData = {
-            status: "success",
-            summary: {
-                origin: loadedData.origin,
-                description: loadedData.description ? loadedData.description : 'No s\'ha trobat cap descripció',
-                altruists: loadedData.altruists,
-                filename: loadedData.filename
-            },
-            data: loadedData
-        };
-    } else {
-        // No s'ha pujat cap fitxer encara
-
-        responseData = {
-            status: "error",
-            message: "No s'ha pujat cap fitxer anteriorment"
-        };
-
-    }
-
-    res.type('json');
-    res.end(JSON.stringify(responseData));
-});
-
-app.post('/upload', function (req, res) {
-    let form = new formidable.IncomingForm();
-
-    // specify that we want to allow the user to upload multiple files in a single request
-    form.multiples = true;
-
-    // store all uploads in the /uploads directory
-    form.uploadDir = path.join(__dirname, '/uploads');
-
-    // every time a file has been uploaded successfully,
-    // rename it to it's orignal name
-    form.on('file', function (field, file) {
-        var filepath = path.join(form.uploadDir, file.name);
-        fs.rename(file.path, filepath, function () {
-            let responseData;
-
-            if (parseDataFile(filepath)) {
-                responseData = {
-                    status: "success",
-                    summary: {
-                        origin: loadedData.origin,
-                        description: loadedData.description ? loadedData.description : 'No s\'ha trobat cap descripció',
-                        altruists: loadedData.altruists,
-                        filename: loadedData.filename
-                    },
-                    data: loadedData
-                };
-            }
-            else {
-                // S'ha produït un error
-                responseData = {
-                    status: "error",
-                    message: "No s'ha pogut processar el fitxer correctament"
-                };
-            }
-            res.type('json');
-            res.end(JSON.stringify(responseData));
-        });
-    });
-
-    form.on('error', function (err) {
-        console.log('Error:: \n' + err);
-    });
-
-    form.parse(req);
 });
 
 app.post('/cadena-trasplantaments', function (req, res){
@@ -117,18 +39,30 @@ app.post('/cadena-trasplantaments', function (req, res){
 
     // every time a file has been uploaded successfully,
     // rename it to it's orignal name
-    form.on('file', function (field, file) {
-        var filepath = path.join(form.uploadDir, file.name);
-        fs.rename(file.path, filepath, function () {
-            parseDataFile(filepath);
-        });
-    });
+    // form.on('file', function (field, file) {
+    //     let filepath = path.join(form.uploadDir, file.name);
+    //     fs.rename(file.path, filepath, function () {
+    //         ids.push(parseDataFile(filepath));
+    //         console.log("--->", ids);
+    //     });
+    // });
 
     form.on('error', function (err) {
         console.log('Error:: \n' + err);
     });
 
-    // form.parse(req);
+    form.parse(req, function(err, fields, files){
+        //TODO mirar como se hace para cargar multiples
+        console.log("--->", files["uploads[]"].path);
+        let ids = [];
+        ids.push(parseDataFile(files["uploads[]"].path));
+        console.log("--->", ids);
+        let response = {
+            "ids": ids
+        };
+        res.type('json');
+        res.end(JSON.stringify(response));
+    });
 });
 
 app.put('/cadena-trasplantaments', function (req, res){
@@ -165,7 +99,15 @@ app.put('/cadena-trasplantaments', function (req, res){
     res.end(JSON.stringify(responseData));
 });
 
-var loadedData = null; // Dades carregades a la memòria
+app.get('/resum', function (req, res){
+    let id = req.query.id;
+    console.log(id);
+    let responseData = objects[id].getSummary();
+    res.type('json');
+    res.end(JSON.stringify(responseData));
+});
+
+var objects = {}; // Dades carregades a la memòria
 /**
  * Analitza el fitxer localitzat a la ruta especificada carregant les dades a memòria i seguidament l'esborra.
  *
@@ -173,12 +115,13 @@ var loadedData = null; // Dades carregades a la memòria
  * @returns {boolean} - cert si s'ha parsejat amb èxit
  */
 function parseDataFile(ruta) {
-    var esCorrecte = false;
-
+    let id = undefined;
     try {
-        loadedData = JSON.parse(fs.readFileSync(ruta, 'utf8'));
-        loadedData.filename = path.basename(ruta);
-        esCorrecte = true;
+        let data = JSON.parse(fs.readFileSync(ruta, 'utf8'));
+        let object = new Lib.OptimitzadorTransplantsLib(data, true);
+        id = object.hashCode();
+        objects[id] = object;
+        objects.filename = path.basename(ruta);
     } catch (e) {
         console.error(e);
     }
@@ -186,7 +129,7 @@ function parseDataFile(ruta) {
     fs.unlink(ruta, function () {/* buida per evitar el warning */
     });
 
-    return esCorrecte;
+    return id;
 }
 
 /* ================================================================================================================
