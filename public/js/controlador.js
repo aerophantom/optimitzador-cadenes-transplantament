@@ -11,7 +11,9 @@ $(document).ready(function () {
         originalAltruists = [],
         currentAltruists = [],
         serverSide = false,
-        descendent = true;
+        descendent = true,
+        identificadorsOptimitzadorsCadenes = [],
+        objects = {};
 
     /**
      * Inicialitza els detectors d'esdeveniments de l'interfície
@@ -26,49 +28,64 @@ $(document).ready(function () {
             $('.progress').toggle(true);
             $progress_bar.text('0%');
             $progress_bar.width('0%');
-            serverSide = $('#server-side').is(":checked");
         });
 
         $upload_input.on('change', function () {
             let files = $(this).get(0).files;
 
             if (files.length > 0) {
-                let formData = new FormData();
+                serverSide = $('#server-side').is(":checked");
+                if (serverSide){
+                    let formData = new FormData();
 
-                for (let i = 0; i < files.length; i++) {
-                    let file = files[i];
-                    formData.append('uploads[]', file, file.name);
-                }
-
-                $.ajax({
-                    url: '/upload',
-                    type: 'POST',
-                    data: formData,
-                    dataType: 'json',
-                    processData: false,
-                    contentType: false,
-                    success: updateSummary,
-                    xhr: function () {
-                        let xhr = new XMLHttpRequest();
-
-                        // listen to the 'progress' event
-                        xhr.upload.addEventListener('progress', function (evt) {
-
-                            if (evt.lengthComputable) {
-                                let percentComplete = evt.loaded / evt.total;
-                                percentComplete = parseInt(percentComplete * 100);
-
-                                $progress_bar.text(percentComplete + '%');
-                                $progress_bar.width(percentComplete + '%');
-
-                                if (percentComplete === 100) {
-                                    $('.progress-bar').html('Fet');
-                                }
-                            }
-                        }, false);
-                        return xhr;
+                    for (let i = 0; i < files.length; i++) {
+                        let file = files[i];
+                        formData.append('uploads[]', file, file.name);
                     }
-                });
+
+                    $.ajax({
+                        url: '/cadena-trasplantaments',
+                        type: 'POST',
+                        data: formData,
+                        dataType: 'json',
+                        processData: false,
+                        contentType: false,
+                        success: updateIdentifiers,
+                        xhr: function () {
+                            let xhr = new XMLHttpRequest();
+
+                            // listen to the 'progress' event
+                            xhr.upload.addEventListener('progress', function (evt) {
+
+                                if (evt.lengthComputable) {
+                                    let percentComplete = evt.loaded / evt.total;
+                                    percentComplete = parseInt(percentComplete * 100);
+
+                                    $progress_bar.text(percentComplete + '%');
+                                    $progress_bar.width(percentComplete + '%');
+
+                                    if (percentComplete === 100) {
+                                        $('.progress-bar').html('Fet');
+                                    }
+                                }
+                            }, false);
+                            return xhr;
+                        }
+                    });
+                }
+                else{
+                    for (let i = 0; i < files.length; i++) {
+                        let f = files[i];
+                        let fr = new FileReader();
+                        fr.onload = (function(file){
+                            let object = new OptimitzadorTransplants(JSON.parse(file.target.result), descendent);
+                            objects[object.hashCode()] = object;
+                        });
+                        fr.readAsText(f);
+                    }
+                    //TODO  de momento consideramos solamente un fichero
+                    updateSummary(objects[0].getSummary());
+                }
             }
         });
 
@@ -150,30 +167,44 @@ $(document).ready(function () {
     /**
      * Actualitza el resum de les dades carregades amb la informació passada com argument.
      *
-     * @param {Object} resposta - diccionari de dades
+     * @param {Object} summary - diccionari de dades
      */
-    updateSummary = function (resposta) {
+    updateSummary = function (summary) {
 
-        if (resposta.status === "success") {
-            $('.progress').toggle(false);
-            $('#originNode').html(resposta.summary.origin);
-            $('#descriptionNode').html(resposta.summary.description);
-            $('#fitxerNode').html(resposta.summary.filename);
+        $('.progress').toggle(false);
+        $('#originNode').html(summary.origin);
+        $('#descriptionNode').html(summary.description);
+        $('#fitxerNode').html("NOMBRE DEL ARCHIVO"); //summary.filename TODO compte, aixo no hi es al fitxer
 
-            originalAltruists = resposta.summary.altruists;
-            updateAltruistsTable(resposta.summary.altruists.slice());
+        originalAltruists = summary.altruists;
+        updateAltruistsTable(summary.altruists.slice());
 
-            $('#file-uploader').toggle(false);
-            $('#llistats').toggle(false);
-            $('#data-summary').toggle(true);
-            $('#data-chains').toggle(false);
+        $('#file-uploader').toggle(false);
+        $('#llistats').toggle(false);
+        $('#data-summary').toggle(true);
+        $('#data-chains').toggle(false);
 
-            optimitzadorTransplants = new OptimitzadorTransplants(resposta.data, descendent);
-        }
-        else {
-            alert(resposta.message);
-        }
+        // optimitzadorTransplants = new OptimitzadorTransplants(response.data, descendent);
+    },
 
+
+    updateIdentifiers = function(response){
+        // Concatena dues llistes
+        identificadorsOptimitzadorsCadenes.push.apply(identificadorsOptimitzadorsCadenes, response.ids);
+        //TODO de momento pediremos el resumen de uno solamente. Hay que pensar como mostrar y seleccionar
+        // el fichero en el cual queremos jugar.
+        let params = {"id": identificadorsOptimitzadorsCadenes[0]};
+
+        $.ajax({
+            url: '/resum',
+            type: 'GET',
+            data: params,
+            dataType: 'json',
+            processData: true,
+            contentType: false,
+            success: updateSummary
+        });
+        //alert(response.message);
         $.LoadingOverlay("hide", true);
     },
 
@@ -290,10 +321,8 @@ $(document).ready(function () {
     },
 
     chainFromServer = function(response){
-        if (response.status === "success"){
-            updateChains(response.trasplantaments);
-            $.LoadingOverlay("hide", true);
-        }
+        updateChains(response.trasplantaments);
+        $.LoadingOverlay("hide", true);
     },
 
     /**
@@ -474,22 +503,6 @@ $(document).ready(function () {
     },
 
     /**
-     * Funció cridada en fer una carrega automàtica del servidor. Si l'estat de la resposta és "success"
-     * s'actualitza el resum amb les dades del servidor, en cas contrari es mostra el carregador per pujar un fitxer.
-     *
-     * @param {Object} resposta - resposta del servidor que pot contenir el resum o un missatge d'error.
-     */
-    autoCarrega = function (resposta) {
-        if (resposta.status === 'success') {
-            updateSummary(resposta);
-            optimitzadorTransplants = new OptimitzadorTransplants(resposta.data, descendent);
-        }
-        else {
-            mostrarLoader();
-        }
-    },
-
-    /**
      * Inicialitza les taules que utilitzen la biblioteca DataTable.
      */
     inicialitzarTaules = function () {
@@ -560,7 +573,7 @@ $(document).ready(function () {
     // En aquesta secció es posa en marxa l'aplicació
     inicialitzarListeners();
     inicialitzarTaules();
-    carregaAutomaticaFitxer();
+    mostrarLoader();
 });
 
 
