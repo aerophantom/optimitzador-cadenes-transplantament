@@ -20,7 +20,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
     var llistatDonantsIgnorats;
     var llistatReceptorsIgnorats;
     var ignorarProbFallada = false;
-
+    let hashCodeComputed = false;
 
     /**
      * Inicialitza els receptors creant una còpia del contingut de la memòria i eliminant els receptors passats com
@@ -516,9 +516,60 @@ var OptimitzadorTransplants = function (dades, descendent) {
         ignorarProbFallada = ignorar;
     }
 
+    /**
+     * Determina si *this és igual a OptTras.
+     *
+     * @param OptTras {OptimitzadorTransplants}
+     * @returns {boolean}
+     */
+    function equal(OptTras){
+        return loadedData === OptTras.loadedData;
+    }
+
+    /**
+     *
+     * @param string
+     * @returns {number}
+     */
+    function computeHashCode(string) {
+        //TODO seria millor posar-lo en un altre lloc, crec
+        let hash = 0, i, chr;
+        if (string.length === 0) return hash;
+        for (i = 0; i < string.length; i++) {
+            chr   = string.charCodeAt(i);
+            hash  = ((hash << 5) - hash) + chr;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+    }
+
+    /**
+     *
+     * @returns {boolean}
+     */
+    function hashCode(){
+        //TODO esta representacion del hashcode indica que el objeto seria como inmutable, asi le cambiemos el
+        //loadedData (Que no se como se podria) siempre retornaria el mismo hashcode.
+        if (!hashCodeComputed){
+            hashCodeComputed = computeHashCode(JSON.stringify(loadedData));
+        }
+        return hashCodeComputed;
+    }
+
+    function getSummary(){
+        return {
+            "origin": loadedData.origin,
+            "description": loadedData.description,
+            "altruists": loadedData.altruists
+        };
+    }
+
     return {
         buildChain: buildChain,
-        getDonantsDeReceptor: getDonantsDeReceptor
+        getDonantsDeReceptor: getDonantsDeReceptor,
+        equal: equal,
+        hashCode: hashCode,
+        getSummary: getSummary
     };
 };
 exports.OptimitzadorTransplantsLib = OptimitzadorTransplants;
