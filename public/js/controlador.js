@@ -200,7 +200,6 @@ $(document).ready(function () {
             type: 'GET',
             data: params,
             dataType: 'json',
-            processData: true,
             contentType: false,
             success: updateSummary
         });
