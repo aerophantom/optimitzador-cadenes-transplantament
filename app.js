@@ -28,7 +28,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/cadena-trasplantaments', function (req, res){
-    // en aquesta crida rebem el fitxer JSON
+    // en aquesta crida rebem els fitxers JSON
     let form = new formidable.IncomingForm();
 
     // specify that we want to allow the user to upload multiple files in a single request
@@ -37,26 +37,22 @@ app.post('/cadena-trasplantaments', function (req, res){
     // store all uploads in the /uploads directory
     form.uploadDir = path.join(__dirname, '/uploads');
 
-    // every time a file has been uploaded successfully,
-    // rename it to it's orignal name
-    // form.on('file', function (field, file) {
-    //     let filepath = path.join(form.uploadDir, file.name);
-    //     fs.rename(file.path, filepath, function () {
-    //         ids.push(parseDataFile(filepath));
-    //         console.log("--->", ids);
-    //     });
-    // });
-
     form.on('error', function (err) {
         console.log('Error:: \n' + err);
     });
 
     form.parse(req, function(err, fields, files){
-        //TODO mirar como se hace para cargar multiples
-        console.log("--->", files["uploads[]"].path);
         let ids = [];
-        ids.push(parseDataFile(files["uploads[]"].path));
-        console.log("--->", ids);
+        if (Array.isArray(files["uploads[]"])){
+            // Si es una llista llavors ha penjat multiples fitxers
+            for(const f of files["uploads[]"]){
+                ids.push(parseDataFile(f.path));
+            }
+        }
+        else{
+            // nomes ha penjat un fitxer
+            ids.push(parseDataFile(files["uploads[]"].path));
+        }
         let response = {
             "ids": ids
         };
@@ -94,14 +90,12 @@ app.put('/cadena-trasplantaments', function (req, res){
         message: "chain calculated succesfully",
         trasplantaments: result
     };
-    console.log(result);
     res.type('json');
     res.end(JSON.stringify(responseData));
 });
 
 app.get('/resum', function (req, res){
     let id = req.query.id;
-    console.log(id);
     let responseData = objects[id].getSummary();
     res.type('json');
     res.end(JSON.stringify(responseData));
