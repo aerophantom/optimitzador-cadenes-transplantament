@@ -7,12 +7,12 @@ $(document).ready(function () {
         previousDepth,
         previousDonor,
         chainsDataTable,
-        optimitzadorTransplants,
         originalAltruists = [],
         currentAltruists = [],
         serverSide = false,
         descendent = true,
         identificadorsOptimitzadorsCadenes = [],
+        hashSelectedObject,
         objects = {};
 
     /**
@@ -80,11 +80,17 @@ $(document).ready(function () {
                         fr.onload = (function(file){
                             let object = new OptimitzadorTransplants(JSON.parse(file.target.result), descendent);
                             objects[object.hashCode()] = object;
+                            if(i === 0){
+                                //TODO  de momento consideramos solamente el primer fichero
+                                hashSelectedObject = object.hashCode();
+                            }
+                            if(i === files.length - 1){
+                                console.log(objects);
+                                updateSummary(objects[hashSelectedObject].getSummary());
+                            }
                         });
                         fr.readAsText(f);
                     }
-                    //TODO  de momento consideramos solamente un fichero
-                    updateSummary(objects[0].getSummary());
                 }
             }
         });
@@ -183,8 +189,6 @@ $(document).ready(function () {
         $('#llistats').toggle(false);
         $('#data-summary').toggle(true);
         $('#data-chains').toggle(false);
-
-        // optimitzadorTransplants = new OptimitzadorTransplants(response.data, descendent);
     },
 
 
@@ -292,6 +296,7 @@ $(document).ready(function () {
         }
         if (serverSide){
             let body = {
+                "id": identificadorsOptimitzadorsCadenes[0], //TODO, de moment agafo el primer id
                 "profunditat": depth,
                 "pacient": patientId,
                 "donantsIgnorats": auxIgnoraDonants,
@@ -311,7 +316,7 @@ $(document).ready(function () {
             });
         }
         else{
-            let cadena = optimitzadorTransplants.buildChain(
+            let cadena = objects[hashSelectedObject].buildChain(
                 depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada
             );
             updateChains(cadena);
@@ -533,7 +538,7 @@ $(document).ready(function () {
      * a ser ignorats i s'afegeixen els donants associats a l'últim receptor a la llista de donants altruistres.
      */
     confirmarTransplants = function (dades, index) {
-        let donantsAssociats = optimitzadorTransplants.getDonantsDeReceptor(dades[index].receptor); // Donants associats a l'últim pacient, que correspon amb l'index
+        let donantsAssociats = objects[hashSelectedObject].getDonantsDeReceptor(dades[index].receptor); // Donants associats a l'últim pacient, que correspon amb l'index
         let altruistaActual = Number(dades[0].donant);
         let indexAltruistaActual = currentAltruists.indexOf(altruistaActual);
         currentAltruists.splice(indexAltruistaActual, 1);

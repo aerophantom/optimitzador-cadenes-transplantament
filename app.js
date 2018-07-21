@@ -4,7 +4,6 @@ var path = require('path');
 var formidable = require('formidable');
 var fs = require('fs');
 var Lib = require('./public/js/optimitzador-transplants.js');
-var OptimitzadorTransplants;
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({
@@ -63,8 +62,7 @@ app.post('/cadena-trasplantaments', function (req, res){
 
 app.put('/cadena-trasplantaments', function (req, res){
     // aquesta crida ens demana que calculem la cadena optima
-    OptimitzadorTransplants = new Lib.OptimitzadorTransplantsLib(loadedData, true);
-
+    let id = req.body.id;
     let depth = req.body.profunditat;
     let patient = req.body.pacient;
     let donantsIgnorats = req.body.donantsIgnorats;
@@ -82,7 +80,7 @@ app.put('/cadena-trasplantaments', function (req, res){
         provesEncreuades = false;
     }
 
-    let result = OptimitzadorTransplants.buildChain(
+    let result = objects[id].buildChain(
         depth, patient, donantsIgnorats, receptorsIgnorats, provesEncreuades, ignorarFallada
     );
     let responseData = {
@@ -115,7 +113,6 @@ function parseDataFile(ruta) {
         let object = new Lib.OptimitzadorTransplantsLib(data, true);
         id = object.hashCode();
         objects[id] = object;
-        objects.filename = path.basename(ruta);
     } catch (e) {
         console.error(e);
     }
