@@ -1,230 +1,215 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Optimitzador de cadenes de transplantament</title>
+        <title>Optimitzador de cadenes de transplantament</title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
 
-    <link href="css/styles.css" rel="stylesheet">
+        <link href="css/styles.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
 
-</head>
-<body>
-
-<div class="container">
-    <div id="file-uploader">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <span class="glyphicon glyphicon-cloud-upload"></span>
-                        <h2>Optimitzador de cadenes de trasplantament</h2>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar"></div>
-                        </div>
-                        <button class="btn btn-lg upload-btn" type="button">Pujar Fitxer</button></br>
-                        <label class="form-check-label">
-                            <input id="server-side" type="checkbox" class="form-check-input">
-                            Processar al servidor
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <input class="upload-input" type="file" multiple="multiple" name="uploads[]"></br>
-    </div>
-
-    <div id="data-summary">
-        <div class="row">
-            <div class="col-xs-12 col-md-6">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h2>Dades del fitxer</h2>
-                        <ul>
-                            <li><strong>Fitxer:</strong> <span id="fitxerNode"></span></li>
-                            <li><strong>Origen:</strong> <span id="originNode"></span></li>
-                            <li><strong>Descripció:</strong> <span id="descriptionNode"></span></li>
-                        </ul>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar"></div>
-                        </div>
-                        <button class="btn btn-lg upload-btn" type="button">Pujar nou fitxer</button>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-xs-12 col-md-6">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h2>Llista de donants altruistes</h2>
-                        <table id="altruistsTable">
-                            <thead>
-                            <tr>
-                                <th>Altruista ID</th>
-                            </tr>
-
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-
-                        <div class="left form-check">
-                            <label class="form-check-label">
-                                <input id="ignorar-prob-fallada" type="checkbox" class="form-check-input">
-                                Ignorar la probabilitat de fallada
-                            </label>
+            <div id="file-uploader">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <span class="glyphicon glyphicon-cloud-upload"></span>
+                                <h2>Optimitzador de cadenes de trasplantament</h2>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar"></div>
+                                </div>
+                                <button class="btn btn-lg upload-btn" type="button">Pujar Fitxer</button><br/>
+                                <label class="form-check-label">
+                                    <input id="server-side" type="checkbox" class="form-check-input">
+                                    Processar al servidor
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <input class="upload-input" type="file" multiple="multiple" name="uploads[]"><br/>
             </div>
-        </div>
-    </div>
 
+            <div id="data-summary">
+                <div class="row">
 
-    <div class="row">
-
-        <div class="col-xs-12 col-md-6">
-            <div id="llistats">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h2>Trasplantaments confirmats</h2>
-
-                        <table id="transplants-confirmats">
-                            <thead>
-                            <tr>
-                                <th>Donant</th>
-                                <th>Receptor</th>
-                            </tr>
-
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-
-                        <button class="btn btn-lg reset-btn" data-llista='confirmats' type="button">Restaurar tots
-                        </button>
+                    <div class="col-xs-12 col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <h2>Dades del fitxer</h2>
+                                <ul>
+                                    <li><strong>Fitxer:</strong> <span id="fitxerNode"></span></li>
+                                    <li><strong>Origen:</strong> <span id="originNode"></span></li>
+                                    <li><strong>Descripció:</strong> <span id="descriptionNode"></span></li>
+                                </ul>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar"></div>
+                                </div>
+                                <button class="btn btn-lg upload-btn" type="button">Pujar nou fitxer</button>
+                                <input type="button" id="dwn-btn" value="Download"/>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
+                    <div class="col-xs-12 col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <h2>Llista de donants altruistes</h2>
 
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h2>Llista de receptors descartats</h2>
+                                <table id="altruistsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Altruista ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
 
-                        <table id="ignora-receptors">
-                            <thead>
-                            <tr>
-                                <th>Receptor</th>
-                                <th class="center">Acció</th>
-                            </tr>
-
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-
-
-                        <button class="btn btn-lg reset-btn" data-llista='receptors' type="button">Restaurar tots
-                        </button>
-
+                                <div class="left form-check">
+                                    <label class="form-check-label">
+                                        <input id="ignorar-prob-fallada" type="checkbox" class="form-check-input">
+                                        Ignorar la probabilitat de fallada
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h2>Llista de donants descartats</h2>
-
-                        <table id="ignora-donants">
-                            <thead>
-                            <tr>
-                                <th>Donant</th>
-                                <th class="center">Acció</th>
-                            </tr>
-
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-
-                        <button class="btn btn-lg reset-btn" data-llista='donants' type="button">Restaurar tots</button>
-                    </div>
-                </div>
-
-
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h2>Resultats positius de la prova encreuada</h2>
-
-                        <table id="ignora-prova-encreuada">
-                            <thead>
-                            <tr>
-                                <th>Receptor</th>
-                                <th>Donant</th>
-                                <th class="center">Acció</th>
-                            </tr>
-
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-
-                        <button class="btn btn-lg reset-btn" data-llista='proves' type="button">Restaurar tots</button>
-                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="data-chains">
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <div id="llistats">
 
-            <div class="col-xs-12 col-md-6">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h2>Cadena de trasplantaments optimitzada</h2>
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <h2>Trasplantaments confirmats</h2>
 
-                        <ul>
-                            <li><strong>Donant altruista:</strong> <span id="altruistNode"></span></li>
-                            <li><strong>Profunditat:</strong> <span id="depthNode"></span></li>
-                        </ul>
+                                <table id="transplants-confirmats">
+                                    <thead>
+                                        <tr>
+                                            <th>Donant</th>
+                                            <th>Receptor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
 
+                                <button class="btn btn-lg reset-btn" data-llista='confirmats' type="button">Restaurar tots</button>
+                            </div>
+                        </div>
 
-                        <table id="chainsTable">
-                            <thead>
-                            <tr>
-                                <th class="center">Ordre</th>
-                                <th class="center">Donant</th>
-                                <th class="center">Receptor</th>
-                                <th class="center baixa-prioritat">% èxit</th>
-                                <th class="center baixa-prioritat">Valor</th>
-                                <th class="center">Prova Enc.</th>
-                                <th class="center">Conf.</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <h2>Llista de receptors descartats</h2>
+
+                                <table id="ignora-receptors">
+                                    <thead>
+                                        <tr>
+                                            <th>Receptor</th>
+                                            <th class="center">Acció</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+
+                                <button class="btn btn-lg reset-btn" data-llista='receptors' type="button">Restaurar tots</button>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <h2>Llista de donants descartats</h2>
+
+                                <table id="ignora-donants">
+                                    <thead>
+                                        <tr>
+                                            <th>Donant</th>
+                                            <th class="center">Acció</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+
+                                <button class="btn btn-lg reset-btn" data-llista='donants' type="button">Restaurar tots</button>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <h2>Resultats positius de la prova encreuada</h2>
+
+                                <table id="ignora-prova-encreuada">
+                                    <thead>
+                                        <tr>
+                                            <th>Receptor</th>
+                                            <th>Donant</th>
+                                            <th class="center">Acció</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+
+                                <button class="btn btn-lg reset-btn" data-llista='proves' type="button">Restaurar tots</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="data-chains">
+                    <div class="col-xs-12 col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <h2>Cadena de trasplantaments optimitzada</h2>
+
+                                <ul>
+                                    <li><strong>Donant altruista:</strong> <span id="altruistNode"></span></li>
+                                    <li><strong>Profunditat:</strong> <span id="depthNode"></span></li>
+                                </ul>
+
+                                <table id="chainsTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="center">Ordre</th>
+                                            <th class="center">Donant</th>
+                                            <th class="center">Receptor</th>
+                                            <th class="center baixa-prioritat">Èxit (%)</th>
+                                            <th class="center baixa-prioritat">Valor</th>
+                                            <th class="center">Prova Enc.</th>
+                                            <th class="center">Conf.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-</div>
-
-<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
-<script src="js/optimitzador-transplants.js"></script>
-<script src="js/controlador.js"></script>
-</body>
+        <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+        <script src="js/optimitzador-transplants.js"></script>
+        <script src="js/controlador.js"></script>
+    </body>
 </html>
