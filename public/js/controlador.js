@@ -35,14 +35,11 @@ $(document).ready(function () {
                     data: params,
                     dataType: 'json',
                     contentType: false,
-                    success: function(data){
-                        download(filename, JSON.stringify(data, null, 2));
-                    }
+                    success: descarregarFitxer
                 });
             }
             else{
-                let content = JSON.stringify(objects[hashSelectedObject].update(), null, 2);
-                download(filename, content);
+                descarregarFitxer(objects[hashSelectedObject].update());
             }
         });
 
@@ -580,6 +577,16 @@ $(document).ready(function () {
         $('#data-chains').toggle(false);
         updatePanellTransplantsConfirmats(confirmats);
 
+    },
+
+    /**
+     * Converteix les dades en un fitxer.
+     *
+     * @param {Object} dades - dades actualitzades.
+     */
+    descarregarFitxer = function(dades) {
+        let content = JSON.stringify(dades, null, 2);
+        download(filename, content);
     },
 
     download = function(filename, text){
