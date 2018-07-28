@@ -1,5 +1,5 @@
 $(document).ready(function () {
-
+    const filename = "UpdatedObject.json";
     let ignoraDonants = [],
         ignoraReceptors = [],
         resultatsProvaEncreuada = [],
@@ -24,14 +24,26 @@ $(document).ready(function () {
         let $download = $('#dwn-btn');
 
         $download.on('click', function () {
-            console.log("desc btn clic");
-            // Generate download of hello.txt file with some content
-            let text = JSON.stringify(objects[hashSelectedObject].update(), null, 2);
-            console.log(text);
 
-            let filename = "UpdatedObject.json";
-
-            download(filename, text);
+            if(serverSide){
+                //TODO de momento pediremos el resumen de uno solamente. Hay que pensar como mostrar y seleccionar
+                // el fichero en el cual queremos jugar.
+                let params = {"id": identificadorsOptimitzadorsCadenes[0]};
+                $.ajax({
+                    url: '/fitxer',
+                    type: 'GET',
+                    data: params,
+                    dataType: 'json',
+                    contentType: false,
+                    success: function(data){
+                        download(filename, JSON.stringify(data, null, 2));
+                    }
+                });
+            }
+            else{
+                let content = JSON.stringify(objects[hashSelectedObject].update(), null, 2);
+                download(filename, content);
+            }
         });
 
         $('.upload-btn').on('click', function () {
