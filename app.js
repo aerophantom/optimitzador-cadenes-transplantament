@@ -99,6 +99,13 @@ app.get('/resum', function (req, res){
     res.end(JSON.stringify(responseData));
 });
 
+app.get('/fitxer', function (req, res){
+    let id = req.query.id;
+    let responseData = objects[id].update();
+    res.type('json');
+    res.end(JSON.stringify(responseData));
+});
+
 var objects = {}; // Dades carregades a la memòria
 /**
  * Analitza el fitxer localitzat a la ruta especificada carregant les dades a memòria i seguidament l'esborra.
