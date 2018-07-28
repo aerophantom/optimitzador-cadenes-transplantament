@@ -564,12 +564,51 @@ var OptimitzadorTransplants = function (dades, descendent) {
         };
     }
 
+    function update(){
+        //fem una copia
+        let obj = JSON.parse(JSON.stringify(loadedData));
+        let patients = obj.patients;
+        let llistatDonantsIgnoratsExtended = llistatDonantsIgnorats.slice();
+
+        //eliminem primer de tot els receptors.
+        for(const receptorIgnorat of llistatReceptorsIgnorats){
+            llistatDonantsIgnoratsExtended = llistatDonantsIgnoratsExtended.concat(patients[receptorIgnorat].related_donors);
+            delete patients[receptorIgnorat];
+        }
+
+        //i ara eliminem els donants.
+        for(let key in patients){
+            let related_donors = patients[key].related_donors;
+            let difference = related_donors.filter(x => llistatDonantsIgnoratsExtended.includes(x));
+            for(const donor of difference){
+                let index = related_donors.indexOf(donor);
+                related_donors.splice(index, 1);
+            }
+            let compatible_donors = patients[key].compatible_donors;
+            let index = 0;
+
+
+            let compatible_donors_to_remove = [];
+            for(const compatible_donor of compatible_donors){
+                if(llistatDonantsIgnoratsExtended.includes(compatible_donor.donor)){
+                    compatible_donors_to_remove.push(index);
+                }
+                index += 1;
+            }
+            for(const compatible_donor_to_remove of compatible_donors_to_remove){
+                compatible_donors.splice(compatible_donor_to_remove, 1);
+            }
+        }
+        return obj;
+    }
+
     return {
         buildChain: buildChain,
         getDonantsDeReceptor: getDonantsDeReceptor,
         equal: equal,
         hashCode: hashCode,
-        getSummary: getSummary
+        getSummary: getSummary,
+        update: update
     };
 };
 exports.OptimitzadorTransplantsLib = OptimitzadorTransplants;

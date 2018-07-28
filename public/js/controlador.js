@@ -21,6 +21,18 @@ $(document).ready(function () {
     var inicialitzarListeners = function () {
         let $upload_input = $('.upload-input');
         let $progress_bar = $('.progress-bar');
+        let $download = $('#dwn-btn');
+
+        $download.on('click', function () {
+            console.log("desc btn clic");
+            // Generate download of hello.txt file with some content
+            let text = JSON.stringify(objects[hashSelectedObject].update(), null, 2);
+            console.log(text);
+
+            let filename = "UpdatedObject.json";
+
+            download(filename, text);
+        });
 
         $('.upload-btn').on('click', function () {
             $upload_input.val(null);
@@ -556,6 +568,19 @@ $(document).ready(function () {
         $('#data-chains').toggle(false);
         updatePanellTransplantsConfirmats(confirmats);
 
+    },
+
+    download = function(filename, text){
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
     },
 
     updatePanellTransplantsConfirmats = function (confirmats) {
