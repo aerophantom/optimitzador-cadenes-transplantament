@@ -11,8 +11,7 @@ $(document).ready(function () {
         currentAltruists = [],
         serverSide = false,
         descendent = true,
-        identificadorsOptimitzadorsCadenes = [],
-        hashSelectedObject,
+        selectedHash = false,
         objects = {};
 
     /**
@@ -26,9 +25,7 @@ $(document).ready(function () {
         $download.on('click', function () {
 
             if(serverSide){
-                //TODO de momento pediremos el resumen de uno solamente. Hay que pensar como mostrar y seleccionar
-                // el fichero en el cual queremos jugar.
-                let params = {"id": identificadorsOptimitzadorsCadenes[0]};
+                let params = {"id": selectedHash};
                 $.ajax({
                     url: '/fitxer',
                     type: 'GET',
@@ -39,7 +36,9 @@ $(document).ready(function () {
                 });
             }
             else{
-                descarregarFitxer(objects[hashSelectedObject].update());
+                descarregarFitxer(objects[selectedHash].update());
+                //TODO: Agregar boton para descargar el log.
+                // download("log.txt", objects[selectedHash].getLog());
             }
         });
 
@@ -95,21 +94,29 @@ $(document).ready(function () {
                     });
                 }
                 else{
+                    let filesData = {};
                     for (let i = 0; i < files.length; i++) {
                         let f = files[i];
                         let fr = new FileReader();
                         fr.onload = (function(file){
-                            let object = new OptimitzadorTransplants(JSON.parse(file.target.result), descendent);
-                            objects[object.hashCode()] = object;
-                            if(i === 0){
-                                //TODO  de momento consideramos solamente el primer fichero
-                                hashSelectedObject = object.hashCode();
+                            let fileName = file.name;
+                            // imperativo entender como leches funciona esto
+                            // https://stackoverflow.com/questions/16937223/pass-a-parameter-to-filereader-onload-event
+                            return function(e){
+                                let object = new OptimitzadorTransplants(JSON.parse(e.target.result), descendent);
+                                objects[object.hashCode()] = object;
+                                filesData[object.hashCode().toString()] = fileName;
+                                if(!selectedHash){
+                                    //TODO  de momento consideramos solamente el primer fichero
+                                    selectedHash = object.hashCode();
+                                }
+                                if(i === files.length - 1){
+                                    updateSummary(objects[selectedHash].getSummary());
+                                    //TODO Estaba haciendo esto. tengo que pasarle el name del file.
+                                    updateFilesTable(filesData)
+                                }
                             }
-                            if(i === files.length - 1){
-                                console.log(objects);
-                                updateSummary(objects[hashSelectedObject].getSummary());
-                            }
-                        });
+                        })(f);
                         fr.readAsText(f);
                     }
                 }
@@ -212,13 +219,9 @@ $(document).ready(function () {
         $('#data-chains').toggle(false);
     },
 
-
     updateIdentifiers = function(response){
-        // Concatena dues llistes
-        identificadorsOptimitzadorsCadenes.push.apply(identificadorsOptimitzadorsCadenes, response.ids);
-        //TODO de momento pediremos el resumen de uno solamente. Hay que pensar como mostrar y seleccionar
-        // el fichero en el cual queremos jugar.
-        let params = {"id": identificadorsOptimitzadorsCadenes[0]};
+        updateFilesTable(response);
+        let params = {"id": selectedHash};
 
         $.ajax({
             url: '/resum',
@@ -230,6 +233,27 @@ $(document).ready(function () {
         });
         //alert(response.message);
         $.LoadingOverlay("hide", true);
+    },
+
+    /**
+     * Actualitza el llistat dels fitxers carregats.
+     *
+     * @param {Object} filesData - informació de fitxers (clau: hash, valor: nom)
+     */
+    updateFilesTable = function (filesData){
+        let $tableBody = $('#filesTable').find('tbody');
+        $tableBody.html('');
+
+        for (const hash in filesData){
+            let fileName = filesData[hash];
+            let $row = $("<tr data-id='" + hash + "'><td>" + fileName + "</td><td>" + hash + "</td></tr>");
+            $tableBody.append($row);
+
+            if(!selectedHash){
+                selectedHash = hash;
+            }
+        }
+        return selectedHash;
     },
 
     /**
@@ -317,7 +341,7 @@ $(document).ready(function () {
         }
         if (serverSide){
             let body = {
-                "id": identificadorsOptimitzadorsCadenes[0], //TODO, de moment agafo el primer id
+                "id": selectedHash,
                 "profunditat": depth,
                 "pacient": patientId,
                 "donantsIgnorats": auxIgnoraDonants,
@@ -337,7 +361,7 @@ $(document).ready(function () {
             });
         }
         else{
-            let cadena = objects[hashSelectedObject].buildChain(
+            let cadena = objects[selectedHash].buildChain(
                 depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada
             );
             updateChains(cadena);
@@ -515,19 +539,6 @@ $(document).ready(function () {
     },
 
     /**
-     * Carrega la informació inicial del servidor.
-     */
-    carregaAutomaticaFitxer = function () {
-        $.LoadingOverlay("show");
-        $.ajax({
-            url: '/autoload',
-            type: 'get',
-            dataType: 'json',
-            success: autoCarrega
-        });
-    },
-
-    /**
      * Inicialitza les taules que utilitzen la biblioteca DataTable.
      */
     inicialitzarTaules = function () {
@@ -559,7 +570,7 @@ $(document).ready(function () {
      * a ser ignorats i s'afegeixen els donants associats a l'últim receptor a la llista de donants altruistres.
      */
     confirmarTransplants = function (dades, index) {
-        let donantsAssociats = objects[hashSelectedObject].getDonantsDeReceptor(dades[index].receptor); // Donants associats a l'últim pacient, que correspon amb l'index
+        let donantsAssociats = objects[selectedHash].getDonantsDeReceptor(dades[index].receptor); // Donants associats a l'últim pacient, que correspon amb l'index
         let altruistaActual = Number(dades[0].donant);
         let indexAltruistaActual = currentAltruists.indexOf(altruistaActual);
         currentAltruists.splice(indexAltruistaActual, 1);
