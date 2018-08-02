@@ -41,20 +41,19 @@ app.post('/cadena-trasplantaments', function (req, res){
     });
 
     form.parse(req, function(err, fields, files){
-        let ids = [];
+        let response = {};
         if (Array.isArray(files["uploads[]"])){
             // Si es una llista llavors ha penjat multiples fitxers
             for(const f of files["uploads[]"]){
-                ids.push(parseDataFile(f.path));
+                let hash = parseDataFile(f.path);
+                response[hash.toString()] = f.name;
             }
         }
         else{
             // nomes ha penjat un fitxer
-            ids.push(parseDataFile(files["uploads[]"].path));
+            let hash = parseDataFile(files["uploads[]"].path);
+            response[hash.toString()] = files["uploads[]"].name;
         }
-        let response = {
-            "ids": ids
-        };
         res.type('json');
         res.end(JSON.stringify(response));
     });
