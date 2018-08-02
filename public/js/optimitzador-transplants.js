@@ -21,6 +21,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
     var llistatReceptorsIgnorats;
     var ignorarProbFallada = false;
     let hashCodeComputed = false;
+    let log = {};
 
     /**
      * Inicialitza els receptors creant una còpia del contingut de la memòria i eliminant els receptors passats com
@@ -253,7 +254,6 @@ var OptimitzadorTransplants = function (dades, descendent) {
         return nouConjunt;
     }
 
-
     /**
      * Crea un array ordenat de tuples amb la informació corresponent als arrays passats per argument ordenat per
      * val.
@@ -366,7 +366,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
      * @param {number} altruist - id del donant altruista que inicia la cadena
      * @param {Array} ignoreDonors - array de id de donants a ignorar
      * @param {Array} ignoreReceptors - array de id de receptors a ignorar
-     * @param resultatsProvaEncreuada - array de cadenes de text amb les parelles de la prova encreuada que han donat
+     * @param {Array} resultatsProvaEncreuada - array de cadenes de text amb les parelles de la prova encreuada que han donat
      * positiu
      * @param {boolean} ignorarFallada - indica si es ignora la probabilitat de fallada.
      * @returns {Array} - array de tuples amb les dades de trasplantament.
@@ -398,6 +398,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
                 val.push(ExpUtMultipleDonors(S[i], [], depth) + scoreMultipleDonors(S[i]));
             }
 
+            log["crossed_tests"] = [];
             let T = obtenirConjuntOrdenatPerValor(S, val); // Llista d'elements de S ordenats incrementalment pel seu val.
             no_more_transplantations = true;
 
@@ -408,6 +409,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
                 if (provaEncreuada(resultatsProvaEncreuada, donant, receptor)) {
                     // Si el resultat de la prova és positiu no es pot fer el trasplantament
                     eliminarDonantCompatibleDeReceptor(donant, receptor);
+                    log["crossed_tests"].push({"donor": donant, "receiver": receptor});
                     continue;
 
                 } else {
@@ -417,7 +419,6 @@ var OptimitzadorTransplants = function (dades, descendent) {
                         probExit: spDonant(donant, receptor),
                         valor: T[i].valor
                     };
-
                     cadenaTransplants.push(dadesTransplant);
                     eliminarDonant(dadesTransplant.donant);
                     eliminarReceptor(dadesTransplant.receptor);
@@ -430,6 +431,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
 
         } while (!no_more_transplantations);
 
+        log["candidates"] = cadenaTransplants;
         return cadenaTransplants;
     }
 
@@ -602,12 +604,70 @@ var OptimitzadorTransplants = function (dades, descendent) {
         return obj;
     }
 
+    function getLog(){
+        let logAsText =  ">LOG: {}\n".format(getDateTime());
+        logAsText += ">TRASPLANTAMENTS:\n";
+        logAsText += "DONANT;RECEPTOR;PROBABILITAT_EXIT;VALOR\n";
+
+        for(const transplantation of log.candidates){
+            logAsText += "{};{};{};{}\n".format(
+                transplantation.donant, transplantation.receptor, transplantation.probExit, transplantation.valor
+            );
+        }
+
+        logAsText += ">POSITIUS PROVES CREUADES\n";
+        logAsText += "DONANT;RECEPTOR\n";
+        for(const positive of log.crossed_tests){
+            logAsText += "{};{}\n".format(positive.donor, positive.receiver);
+        }
+
+        return logAsText;
+    }
+
+    String.prototype.format = function() {
+        // https://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+        // estaria de puta madre indicar como furula esta, es un reduce.
+        // mas info: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
+        // console.log('Is that a %s or a %s?... No, it\'s %s!'.format('plane', 'bird', 'SOman'));
+        return [...arguments].reduce((p,c) => p.replace(/{}/,c), this);
+    };
+
+
+    //TODO estaria be fer un utils.js Podria afegir la funcio que genera el hashcode
+    function getDateTime() {
+        let now     = new Date();
+        let year    = now.getFullYear();
+        let month   = now.getMonth()+1;
+        let day     = now.getDate();
+        let hour    = now.getHours();
+        let minute  = now.getMinutes();
+        let second  = now.getSeconds();
+        if(month.toString().length == 1) {
+            month = '0'+month;
+        }
+        if(day.toString().length == 1) {
+            day = '0'+day;
+        }
+        if(hour.toString().length == 1) {
+            hour = '0'+hour;
+        }
+        if(minute.toString().length == 1) {
+            minute = '0'+minute;
+        }
+        if(second.toString().length == 1) {
+            second = '0'+second;
+        }
+        let dateTime = year+'/'+month+'/'+day+' '+hour+':'+minute+':'+second;
+        return dateTime;
+    }
+
     return {
         buildChain: buildChain,
         getDonantsDeReceptor: getDonantsDeReceptor,
         equal: equal,
         hashCode: hashCode,
         getSummary: getSummary,
+        getLog: getLog,
         update: update
     };
 };
