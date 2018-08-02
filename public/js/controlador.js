@@ -221,7 +221,12 @@ $(document).ready(function () {
 
     updateIdentifiers = function(response){
         updateFilesTable(response);
-        let params = {"id": selectedHash};
+        updateSummaryFromServer(selectedHash);
+        $.LoadingOverlay("hide", true);
+    },
+
+    updateSummaryFromServer = function(hash){
+        let params = {"id": hash};
 
         $.ajax({
             url: '/resum',
@@ -231,8 +236,6 @@ $(document).ready(function () {
             contentType: false,
             success: updateSummary
         });
-        //alert(response.message);
-        $.LoadingOverlay("hide", true);
     },
 
     /**
@@ -248,7 +251,15 @@ $(document).ready(function () {
             let fileName = filesData[hash];
             let $row = $("<tr data-id='" + hash + "'><td>" + fileName + "</td><td>" + hash + "</td></tr>");
             $tableBody.append($row);
-
+            $row.on('click', function(){
+                selectedHash = $(this).attr('data-id');
+                if(serverSide){
+                    updateSummaryFromServer(selectedHash);
+                }
+                else{
+                    updateSummary(objects[selectedHash].getSummary());
+                }
+            });
             if(!selectedHash){
                 selectedHash = hash;
             }

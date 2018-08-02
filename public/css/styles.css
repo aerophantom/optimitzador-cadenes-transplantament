@@ -91,8 +91,16 @@ li {
     background-color: #F89406;
 }
 
-#altruistsTable th, #altruistsTable td {
+#altruistsTable th, #altruistsTable td, #filesTable  th, #filesTable td  {
     text-align: center;
+}
+
+#filesTable td{
+    cursor: pointer;
+}
+
+#filesTable tbody tr:hover{
+    background-color: #F89406;
 }
 
 .form-check.left, th.left, td.left {
