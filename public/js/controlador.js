@@ -268,8 +268,8 @@ $(document).ready(function () {
 
         $tableBody.html('');
 
-        for (let i = 0; i < altruistsData.length; i++) {
-            let $row = $("<tr data-id='" + altruistsData[i] + "'><td title='Selecciona al donant " + altruistsData[i] + " per iniciar la cadena'>" + altruistsData[i] + "</td></tr>");
+        for (const altruistID of altruistsData) {
+            let $row = $("<tr data-id='" + altruistID + "'><td title='Selecciona al donant " + altruistID + " per iniciar la cadena'>" + altruistID + "</td></tr>");
             $tableBody.append($row);
             $row.on('click', function () {
                 let patientId = $(this).attr('data-id');
