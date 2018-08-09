@@ -221,7 +221,7 @@ export default class TransplantOptimizer{
      * @param {Array} conjuntB - elements a eliminar
      * @private
      */
-    eliminarElementsDelConjuntMultipleDonors(conjuntA, conjuntB) {
+    static eliminarElementsDelConjuntMultipleDonors(conjuntA, conjuntB) {
         let nouConjunt = [];
 
         for (const elemA of conjuntA) {
@@ -242,7 +242,7 @@ export default class TransplantOptimizer{
      * paràmetres ordenada incrementalment
      * @private
      */
-    obtenirConjuntOrdenatPerValor(S, val) {
+    static obtenirConjuntOrdenatPerValor(S, val) {
         let T = [];
 
         for (let i = 0; i < S.length; i++) {
@@ -273,7 +273,7 @@ export default class TransplantOptimizer{
         // afegit la dada "donant_candidat"
         let S = this.succMultipleDonors(rec);
 
-        S = this.eliminarElementsDelConjuntMultipleDonors(S, rec_list);
+        S = TransplantOptimizer.eliminarElementsDelConjuntMultipleDonors(S, rec_list);
         rec_list = rec_list.slice();
 
 
@@ -296,7 +296,7 @@ export default class TransplantOptimizer{
                 );
             }
             // Llista d'elements de S ordenats incrementalment pel seu val.
-            let T = this.obtenirConjuntOrdenatPerValor(S, val);
+            let T = TransplantOptimizer.obtenirConjuntOrdenatPerValor(S, val);
             return this.sumatoriProbabilitatsMultipleDonants(T);
         }
     }
@@ -390,7 +390,7 @@ export default class TransplantOptimizer{
 
             this._Log.crossed_tests = [];
             // Llista d'elements de S ordenats incrementalment pel seu val.
-            let T = this.obtenirConjuntOrdenatPerValor(S, val);
+            let T = TransplantOptimizer.obtenirConjuntOrdenatPerValor(S, val);
             no_more_transplantations = true;
 
             //TODO refactoritzable for of a la espera de un nombre adecuado.
