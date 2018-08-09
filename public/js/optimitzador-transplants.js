@@ -605,7 +605,7 @@ var OptimitzadorTransplants = function (dades, descendent) {
     }
 
     function getLog(){
-        let logAsText =  ">LOG: {}\n".format(getDateTime());
+        let logAsText =  ">LOG: {}\n".format(Utils.currentDateTime);
         logAsText += ">TRASPLANTAMENTS:\n";
         logAsText += "DONANT;RECEPTOR;PROBABILITAT_EXIT;VALOR\n";
 
@@ -622,43 +622,6 @@ var OptimitzadorTransplants = function (dades, descendent) {
         }
 
         return logAsText;
-    }
-
-    String.prototype.format = function() {
-        // https://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
-        // estaria de puta madre indicar como furula esta, es un reduce.
-        // mas info: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-        // console.log('Is that a %s or a %s?... No, it\'s %s!'.format('plane', 'bird', 'SOman'));
-        return [...arguments].reduce((p,c) => p.replace(/{}/,c), this);
-    };
-
-
-    //TODO estaria be fer un utils.js Podria afegir la funcio que genera el hashcode
-    function getDateTime() {
-        let now     = new Date();
-        let year    = now.getFullYear();
-        let month   = now.getMonth()+1;
-        let day     = now.getDate();
-        let hour    = now.getHours();
-        let minute  = now.getMinutes();
-        let second  = now.getSeconds();
-        if(month.toString().length == 1) {
-            month = '0'+month;
-        }
-        if(day.toString().length == 1) {
-            day = '0'+day;
-        }
-        if(hour.toString().length == 1) {
-            hour = '0'+hour;
-        }
-        if(minute.toString().length == 1) {
-            minute = '0'+minute;
-        }
-        if(second.toString().length == 1) {
-            second = '0'+second;
-        }
-        let dateTime = year+'/'+month+'/'+day+' '+hour+':'+minute+':'+second;
-        return dateTime;
     }
 
     return {
