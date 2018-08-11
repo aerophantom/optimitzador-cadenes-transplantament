@@ -1,5 +1,7 @@
+"use strict";
+
 import test from 'ava';
-import TransplantOptimizer from '../public/js/TransplantOptimizer';
+import TransplantOptimizer from '../public/js/TransplantOptimizer.mjs';
 
 // TODO temporal: serial ideal carregar el fitxer abans d'executar
 // els tests
@@ -138,7 +140,7 @@ test('build chain with crossed test', t => {
     let kwargs = {"crossedTests": ["2003-3001"]};
     let chain = to.buildChain(3, "1000", kwargs);
     for (const transplant of chain) {
-        if (transplant.donant == "3001" && transplant.receptor=="2003") {
+        if (transplant.donant === "3001" && transplant.receptor === "2003") {
             t.fail('The final chain contains the transplant with 2003 as ' +
                 'donor and 2003 as recipient'
             );
@@ -299,7 +301,7 @@ test('calculate summation', t => {
     to.inicialitzarReceptors();
     to.inicialitzarDonants();
 
-    var T = [
+    let T = [
         {receptor: {receptor: "2001", donant: "3000"}, valor: "100"},  // pf: 0.2
         {receptor: {receptor: "2002", donant: "3000"}, valor: "50"},  // pf: 0.2
         {receptor: {receptor: "2004", donant: "3000"}, valor: "10"}  // pf: 0.1

@@ -1,10 +1,17 @@
-var express = require('express');
-var app = express();
-var path = require('path');
-var formidable = require('formidable');
-var fs = require('fs');
-var Lib = require('./public/js/optimitzador-transplants.js');
-const bodyParser = require('body-parser');
+"use strict";
+
+import express from 'express';
+let app = express();
+import path from 'path';
+import formidable from 'formidable';
+import fs from 'fs';
+import TransplantOptimizer from './public/js/TransplantOptimizer';
+import bodyParser from 'body-parser';
+
+let __dirname = path.dirname(new URL(import.meta.url).pathname);
+// if path has whitespeaces, then path.dirname will replace them with "%20"
+// the next function replaces the "%20" with whitespaces
+__dirname = __dirname.replace(/%20/g, " ");
 
 app.use(bodyParser.urlencoded({
     extended: false
@@ -64,24 +71,15 @@ app.put('/cadena-trasplantaments', function (req, res){
     let id = req.body.id;
     let depth = req.body.profunditat;
     let patient = req.body.pacient;
-    let donantsIgnorats = req.body.donantsIgnorats;
-    let receptorsIgnorats = req.body.receptorsIgnorats;
-    let provesEncreuades = req.body.provesEncreuades;
-    let ignorarFallada = req.body.ignorarFallada;
 
-    if (donantsIgnorats.length === 0){
-        donantsIgnorats = false;
-    }
-    if (receptorsIgnorats.length === 0){
-        receptorsIgnorats = false;
-    }
-    if (provesEncreuades.length === 0){
-        provesEncreuades = false;
-    }
+    let kwargs = {
+        ignoredDonors: req.body.donantsIgnorats,
+        ignoredRecipients: req.body.receptorsIgnorats,
+        crossedTests: req.body.provesEncreuades,
+        ignoreFailureProbability: req.body.ignorarFallada
+    };
 
-    let result = objects[id].buildChain(
-        depth, patient, donantsIgnorats, receptorsIgnorats, provesEncreuades, ignorarFallada
-    );
+    let result = objects[id].buildChain(depth, patient, kwargs);
     let responseData = {
         status: "success",
         message: "chain calculated succesfully",
@@ -93,19 +91,23 @@ app.put('/cadena-trasplantaments', function (req, res){
 
 app.get('/resum', function (req, res){
     let id = req.query.id;
-    let responseData = objects[id].getSummary();
+    let responseData = objects[id].summary;
     res.type('json');
     res.end(JSON.stringify(responseData));
 });
 
 app.get('/fitxer', function (req, res){
     let id = req.query.id;
-    let responseData = objects[id].update();
+    let responseData = objects[id].update;
     res.type('json');
     res.end(JSON.stringify(responseData));
 });
 
-var objects = {}; // Dades carregades a la memòria
+/**
+ *
+ * @type {{string: TransplantOptimizer}}
+ */
+let objects = {}; // Dades carregades a la memòria
 /**
  * Analitza el fitxer localitzat a la ruta especificada carregant les dades a memòria i seguidament l'esborra.
  *
@@ -113,11 +115,11 @@ var objects = {}; // Dades carregades a la memòria
  * @returns {boolean} - cert si s'ha parsejat amb èxit
  */
 function parseDataFile(ruta) {
-    let id = undefined;
+    let id;
     try {
         let data = JSON.parse(fs.readFileSync(ruta, 'utf8'));
-        let object = new Lib.OptimitzadorTransplantsLib(data, true);
-        id = object.hashCode();
+        let object = new TransplantOptimizer(data);
+        id = object.hashCode;
         objects[id] = object;
     } catch (e) {
         console.error(e);
@@ -134,7 +136,7 @@ function parseDataFile(ruta) {
  * Aquesta secció inicia l'aplicació com a servidor HTTP.
  *
  * ================================================================================================================ */
-var port = 80;
-var server = app.listen(port, function () {
+let port = 8069;
+let server = app.listen(port, function () {
     console.log('Servidor escoltant al port ' + port);
 });

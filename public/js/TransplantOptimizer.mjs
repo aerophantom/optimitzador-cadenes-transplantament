@@ -1,3 +1,6 @@
+/**
+ * Classe que representa una un optimitzador de trasplantaments.
+ */
 export default class TransplantOptimizer{
 
     /**
@@ -130,7 +133,7 @@ export default class TransplantOptimizer{
      * Retorna un array de dades amb els receptors compatibles amb el donant
      * passat com argument.
      *
-     * @param {int} donorId - identificador del donant
+     * @param {string} donorId - identificador del donant
      * @returns {Array} - array de dades amb els receptors compatibles amb el
      * donant.
      * @private
@@ -152,23 +155,24 @@ export default class TransplantOptimizer{
      * Retorna un array amb els identificadors dels receptors compatibles amb
      * el donant corresponent al id passat com argument.
      *
-     * @param {number} donorId - id del donant
+     * @param {string} donorId - id del donant
      * @returns {Array} - array amb els identificadors dels receptors
      * compatibles amb el donant.
      */
     succDonant(donorId) {
-        if (donorId === -1 || !this._Donors[donorId]) {
-            return [];
+        let compatibleRecipients = [];
+        if (this._Donors[donorId]) {
+            compatibleRecipients = Object.keys(this._Donors[donorId]);
         }
-        return Object.keys(this._Donors[donorId]);
+        return compatibleRecipients;
     }
 
     /**
      * Retorna la probabilitat d'èxit d'un trasplantament entre el donant i el
      * receptor passats com argument.
      *
-     * @param {number} donorId - id del donant
-     * @param {number} recipientId - id del receptor
+     * @param {string} donorId - id del donant
+     * @param {string} recipientId - id del receptor
      * @returns {number} - probabilitat d'èxit del trasplantament
      */
     spDonant(donorId, recipientId) {
@@ -221,7 +225,7 @@ export default class TransplantOptimizer{
      * @param {Array} conjuntB - elements a eliminar
      * @private
      */
-    eliminarElementsDelConjuntMultipleDonors(conjuntA, conjuntB) {
+    static eliminarElementsDelConjuntMultipleDonors(conjuntA, conjuntB) {
         let nouConjunt = [];
 
         for (const elemA of conjuntA) {
@@ -242,7 +246,7 @@ export default class TransplantOptimizer{
      * paràmetres ordenada incrementalment
      * @private
      */
-    obtenirConjuntOrdenatPerValor(S, val) {
+    static obtenirConjuntOrdenatPerValor(S, val) {
         let T = [];
 
         for (let i = 0; i < S.length; i++) {
@@ -273,7 +277,7 @@ export default class TransplantOptimizer{
         // afegit la dada "donant_candidat"
         let S = this.succMultipleDonors(rec);
 
-        S = this.eliminarElementsDelConjuntMultipleDonors(S, rec_list);
+        S = TransplantOptimizer.eliminarElementsDelConjuntMultipleDonors(S, rec_list);
         rec_list = rec_list.slice();
 
 
@@ -296,7 +300,7 @@ export default class TransplantOptimizer{
                 );
             }
             // Llista d'elements de S ordenats incrementalment pel seu val.
-            let T = this.obtenirConjuntOrdenatPerValor(S, val);
+            let T = TransplantOptimizer.obtenirConjuntOrdenatPerValor(S, val);
             return this.sumatoriProbabilitatsMultipleDonants(T);
         }
     }
@@ -345,20 +349,20 @@ export default class TransplantOptimizer{
      * altruista tenint en compte la profunditat màxima a explorar, els donants
      * i receptors a ignorar i els resultats de les proves encreuades.
      *
-     * @param {number} depth - profunditat màxima a explorar
-     * @param {String} altruist - id del donant altruista que inicia la cadena
-     * @param {Array} ignoredDonors - array de id de donants a ignorar
-     * @param {Array} ignoredRecipients - array de id de receptors a ignorar
-     * @param {Array} resultatsProvaEncreuada - array de cadenes de text amb
-     * les parelles de la prova encreuada que han donat positiu
-     * @param {boolean} ignorarFallada - indica si es ignora la probabilitat de
-     * fallada.
+     * @param {number} depth - profunditat màxima a explorar.
+     * @param {string} altruist - id del donant altruista que inicia la cadena.
+     * @param {Object} [kwargs] - arguments opcionals per construir la cadena.
+     * @param {Array} [kwargs.ignoredDonors] - array de id de donants a ignorar.
+     * @param {Array} [kwargs.ignoredRecipients] - array de id de receptors a
+     * ignorar.
+     * @param {Array} [kwargs.crossedTests] - array de cadenes de text amb
+     * les parelles de la prova encreuada que han donat positiu.
+     * @param {Array} [kwargs.ignoreFailureProbability] - indica si es ignora la
+     * probabilitat de fallada.
      * @returns {Array} - array de tuples amb les dades de trasplantament.
      * @public
      */
-    //TODO sugerencia, muchos de estos parametros no son obligatorios, podria
-    //hacer uso del kwargs o algo asi
-    buildChain(depth, altruist, kwargs = {}) {//ignoredDonors, ignoredRecipients, crossedTests, ignorarFallada) {
+    buildChain(depth, altruist, kwargs = {}) {
         let current = altruist;
         let no_more_transplantations;
         let cadenaTransplants = [];
@@ -366,7 +370,7 @@ export default class TransplantOptimizer{
 
         this._IgnoredDonors = [];
         this._IgnoredRecipients = [];
-        this._IgnoreFailureProbability = kwargs.ignorarFallada || false;
+        this._IgnoreFailureProbability = kwargs.ignoreFailureProbability || false;
 
         this.inicialitzarReceptors(kwargs);
         this.inicialitzarDonants(kwargs);
@@ -390,7 +394,7 @@ export default class TransplantOptimizer{
 
             this._Log.crossed_tests = [];
             // Llista d'elements de S ordenats incrementalment pel seu val.
-            let T = this.obtenirConjuntOrdenatPerValor(S, val);
+            let T = TransplantOptimizer.obtenirConjuntOrdenatPerValor(S, val);
             no_more_transplantations = true;
 
             //TODO refactoritzable for of a la espera de un nombre adecuado.
@@ -435,8 +439,8 @@ export default class TransplantOptimizer{
      *
      * @param {Array} resultatsProva - array amb els resultats de les proves
      * encreuades
-     * @param {number} donant - id del donant
-     * @param {number} receptor - id del receptor
+     * @param {string} donant - id del donant
+     * @param {string} receptor - id del receptor
      * @returns {boolean} - Cert si la prova és positiva o fals en cas contrari
      */
     static provaEncreuada(resultatsProva, donant, receptor) {
@@ -451,8 +455,8 @@ export default class TransplantOptimizer{
     /**
      * Elimina un donant de la llista de donants compatibles d'un receptor.
      *
-     * @param {number} donorId - id del donant
-     * @param {number} recipientId - id del receptor
+     * @param {string} donorId - id del donant
+     * @param {string} recipientId - id del receptor
      */
     eliminarDonantCompatibleDeReceptor(donorId, recipientId) {
         // Eliminem l'associació del donant amb el receptor
@@ -483,7 +487,7 @@ export default class TransplantOptimizer{
      * Elimina un receptor de la llista de receptors i els seus donants
      * associats
      *
-     * @param {number} recipientId - id del receptor
+     * @param {string} recipientId - id del receptor
      */
     eliminarReceptor(recipientId) {
         let donantsCompatibles = this._Recipients[recipientId].compatible_donors;
@@ -540,6 +544,10 @@ export default class TransplantOptimizer{
         return this._HashCodeComputed;
     }
 
+    /**
+     * 
+     * @returns {*}
+     */
     get log(){
         let logAsText =  ">LOG: {}\n".format(Utils.currentDateTime);
         logAsText += ">TRASPLANTAMENTS:\n";
@@ -561,6 +569,10 @@ export default class TransplantOptimizer{
         return logAsText;
     }
 
+    /**
+     *
+     * @returns {{origin: *, description: *, altruists: (string[]|number[])}}
+     */
     get summary(){
         return {
             "origin": this._CompatibilityGraph.origin,
@@ -569,6 +581,10 @@ export default class TransplantOptimizer{
         };
     }
 
+    /**
+     *
+     * @returns {any}
+     */
     get update(){
         //fem una copia
         let obj = JSON.parse(JSON.stringify(this._CompatibilityGraph));
