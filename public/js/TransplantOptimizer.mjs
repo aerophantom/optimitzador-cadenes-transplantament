@@ -1,3 +1,5 @@
+import Utils from './Utils';
+
 /**
  * Classe que representa un optimitzador de trasplantaments.
  */
