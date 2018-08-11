@@ -1,7 +1,7 @@
 "use strict";
 
 import test from 'ava';
-import TransplantOptimizer from '../public/js/TransplantOptimizer';
+import TransplantOptimizer from '../public/js/TransplantOptimizer.mjs';
 
 // TODO temporal: serial ideal carregar el fitxer abans d'executar
 // els tests

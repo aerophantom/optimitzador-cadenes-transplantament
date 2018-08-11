@@ -1,16 +1,23 @@
+"use strict";
+
 import express from 'express';
-var app = express();
+let app = express();
 import path from 'path';
 import formidable from 'formidable';
 import fs from 'fs';
 import TransplantOptimizer from './public/js/TransplantOptimizer';
 import bodyParser from 'body-parser';
-console.log(import.meta);
+
+let __dirname = path.dirname(new URL(import.meta.url).pathname);
+// if path has whitespeaces, then path.dirname will replace them with "%20"
+// the next function replaces the "%20" with whitespaces
+__dirname = __dirname.replace(/%20/g, " ");
+
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(import.meta, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 /* ================================================================================================================
  * La documentació de l'API es pot trobar a: https://app.apiary.io/trasplantaments
  * Aquesta secció correspon a l'encaminament i accepta les següents rutes:
@@ -23,7 +30,7 @@ app.use(express.static(path.join(import.meta, 'public')));
  * ================================================================================================================ */
 
 app.get('/', function (req, res) {
-    res.sendFile(path.join(import.meta, 'views/index.html'));
+    res.sendFile(path.join(__dirname, 'views/index.html'));
 });
 
 app.post('/cadena-trasplantaments', function (req, res){
@@ -34,7 +41,7 @@ app.post('/cadena-trasplantaments', function (req, res){
     form.multiples = true;
 
     // store all uploads in the /uploads directory
-    form.uploadDir = path.join(import.meta, '/uploads');
+    form.uploadDir = path.join(__dirname, '/uploads');
 
     form.on('error', function (err) {
         console.log('Error:: \n' + err);
@@ -100,7 +107,7 @@ app.get('/fitxer', function (req, res){
  *
  * @type {{string: TransplantOptimizer}}
  */
-var objects = {}; // Dades carregades a la memòria
+let objects = {}; // Dades carregades a la memòria
 /**
  * Analitza el fitxer localitzat a la ruta especificada carregant les dades a memòria i seguidament l'esborra.
  *
@@ -108,7 +115,7 @@ var objects = {}; // Dades carregades a la memòria
  * @returns {boolean} - cert si s'ha parsejat amb èxit
  */
 function parseDataFile(ruta) {
-    let id = undefined;
+    let id;
     try {
         let data = JSON.parse(fs.readFileSync(ruta, 'utf8'));
         let object = new TransplantOptimizer(data);
@@ -129,7 +136,7 @@ function parseDataFile(ruta) {
  * Aquesta secció inicia l'aplicació com a servidor HTTP.
  *
  * ================================================================================================================ */
-var port = 8069;
-var server = app.listen(port, function () {
+let port = 8069;
+let server = app.listen(port, function () {
     console.log('Servidor escoltant al port ' + port);
 });
