@@ -543,9 +543,6 @@ export default class TransplantOptimizer{
      * @returns {number} - Hash code of *this.
      */
     get hashCode(){
-        //TODO esta representacion del hashcode indica que el objeto seria como
-        // inmutable, asi le cambiemos el loadedData (Que no se como se podria)
-        // siempre retornaria el mismo hashcode.
         if (!this._HashCodeComputed){
             let compatibilityGraphAsString = JSON.stringify(
                 this._CompatibilityGraph
