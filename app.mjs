@@ -1,33 +1,43 @@
 "use strict";
 
 import express from 'express';
-let app = express();
 import path from 'path';
 import formidable from 'formidable';
 import fs from 'fs';
 import TransplantOptimizer from './public/js/TransplantOptimizer';
 import bodyParser from 'body-parser';
 
+/* =============================================================================
+ *
+ * app initialization
+ *
+ * ========================================================================== */
+
 let __dirname = path.dirname(new URL(import.meta.url).pathname);
 // if path has whitespeaces, then path.dirname will replace them with "%20"
 // the next function replaces the "%20" with whitespaces
 __dirname = __dirname.replace(/%20/g, " ");
+
+/**
+ * For each file loaded, there will be a TrasplantOptimizer object.
+ * @type {{string: TransplantOptimizer}}
+ */
+let objects = {};
+let app = express();
 
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
-/* ================================================================================================================
- * La documentació de l'API es pot trobar a: https://app.apiary.io/trasplantaments
- * Aquesta secció correspon a l'encaminament i accepta les següents rutes:
- *      /                           (GET)   → serveix l'index.html
- *      /upload                     (POST)  → puja el fitxer per processar i, si és correcte, retorna el resum en format JSON
+
+/* =============================================================================
  *
- *      Per executar codi al servidor:
- *      /cadena-trasplantaments     (POST)  → Crea l'objecte que optimitza la cadena de trasplants.
- *                                  (PUT)   → Obté la cadena de trasplantaments.
- * ================================================================================================================ */
+ * REST treatment
+ * API Documentation:
+ *     https://trasplantaments.docs.apiary.io/#
+ *
+ * ========================================================================== */
 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'views/index.html'));
@@ -37,7 +47,8 @@ app.post('/cadena-trasplantaments', function (req, res){
     // en aquesta crida rebem els fitxers JSON
     let form = new formidable.IncomingForm();
 
-    // specify that we want to allow the user to upload multiple files in a single request
+    // specify that we want to allow the user to upload multiple files in a
+    // single request
     form.multiples = true;
 
     // store all uploads in the /uploads directory
@@ -103,15 +114,17 @@ app.get('/fitxer', function (req, res){
     res.end(JSON.stringify(responseData));
 });
 
-/**
+/* =============================================================================
  *
- * @type {{string: TransplantOptimizer}}
- */
-let objects = {}; // Dades carregades a la memòria
-/**
- * Analitza el fitxer localitzat a la ruta especificada carregant les dades a memòria i seguidament l'esborra.
+ * Helper functions
  *
- * @param ruta - ruta del fitxer que es vol analitzar
+ * ========================================================================== */
+
+/**
+ * Analitza el fitxer localitzat a la ruta especificada carregant les dades a
+ * memòria i seguidament l'esborra.
+ *
+ * @param {string} ruta - ruta del fitxer que es vol analitzar
  * @returns {boolean} - cert si s'ha parsejat amb èxit
  */
 function parseDataFile(ruta) {
@@ -131,12 +144,12 @@ function parseDataFile(ruta) {
     return id;
 }
 
-/* ================================================================================================================
+/* =============================================================================
  *
- * Aquesta secció inicia l'aplicació com a servidor HTTP.
+ * Start HTTP server
  *
- * ================================================================================================================ */
+ * ========================================================================== */
 let port = 8069;
-let server = app.listen(port, function () {
+app.listen(port, function () {
     console.log('Servidor escoltant al port ' + port);
 });
