@@ -91,13 +91,9 @@ app.put('/cadena-trasplantaments', function (req, res){
     };
 
     let result = objects[id].buildChain(depth, patient, kwargs);
-    let responseData = {
-        status: "success",
-        message: "chain calculated succesfully",
-        trasplantaments: result
-    };
+
     res.type('json');
-    res.end(JSON.stringify(responseData));
+    res.end(JSON.stringify(result));
 });
 
 app.get('/resum', function (req, res){
