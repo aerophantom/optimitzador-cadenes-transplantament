@@ -1,4 +1,11 @@
 $(document).ready(function () {
+
+    /**
+     * Llista d'objectes que conté la informació que constitueix una cadena.
+     * @typedef {Array.<{receptor: string, donant: string, probExit: number, valor: number}>} Chain
+     * @
+     */
+
     const filename = "UpdatedObject.json";
     let ignoraDonants = [],
         ignoraReceptors = [],
@@ -18,7 +25,7 @@ $(document).ready(function () {
     /**
      * Inicialitza els detectors d'esdeveniments de l'interfície
      */
-    var inicialitzarListeners = function () {
+    function inicialitzarListeners() {
         let $upload_input = $('.upload-input');
         let $progress_bar = $('.progress-bar');
         let $download = $('#dwn-btn');
@@ -33,11 +40,11 @@ $(document).ready(function () {
                     data: params,
                     dataType: 'json',
                     contentType: false,
-                    success: descarregarFitxer
+                    success: downloadUpdatedFile
                 });
             }
             else{
-                descarregarFitxer(objects[selectedHash].update());
+                downloadUpdatedFile(objects[selectedHash].update());
                 //TODO: Agregar boton para descargar el log.
                 // download("log.txt", objects[selectedHash].getLog());
             }
@@ -139,13 +146,13 @@ $(document).ready(function () {
         $(window).resize(function() {
             updateChainTableHeaders();
         });
-    },
+    }
 
     /**
      * Actualitza les capçaleres de la taula de la cadena de trasplantaments
      * segons l'amplada de la pantalla
      */
-    updateChainTableHeaders = function() {
+    function updateChainTableHeaders() {
         let width = $(window).width();
         let $headers = $('#chainsTable thead tr th');
 
@@ -159,14 +166,14 @@ $(document).ready(function () {
             $headers.get(1).innerHTML = "Donant";
             $headers.get(2).innerHTML = "Receptor";
         }
-    },
+    }
 
     /**
      * Inicialitza la llista del tipus passat com argument
      *
      * @param {string} tipus - tipus de llista
      */
-    resetLlista = function (tipus) {
+    function resetLlista(tipus) {
         switch (tipus) {
             case 'proves':
                 resultatsProvaEncreuada = [];
@@ -189,15 +196,15 @@ $(document).ready(function () {
             default:
                 console.error("No s'ha definit el tipus de reset", tipus);
         }
-    },
+    }
 
     /**
      * Actualitza el resum de les dades carregades amb la informació passada
      * com argument.
      *
-     * @param {Object} summary - diccionari de dades
+     * @param {{origin: string, description: string, altruists: (string[])}} summary - diccionari de dades
      */
-    updateSummary = function (summary) {
+    function updateSummary(summary) {
 
         $('.progress').toggle(false);
         $('#originNode').html(summary.origin);
@@ -211,16 +218,29 @@ $(document).ready(function () {
         $('#llistats').toggle(false);
         $('#data-summary').toggle(true);
         $('#data-chains').toggle(false);
-    },
+    }
 
-    updateIdentifiers = function(response){
+    /**
+     * Updates the identifier and summary panels.
+     *
+     * @param {Object} response - Key: TransplantOptimizer hash. Value: file
+     * name.
+     */
+    function updateIdentifiers(response){
         fileName = response;
         updateFilesTable(response);
         updateSummaryFromServer(selectedHash);
         $.LoadingOverlay("hide", true);
-    },
+    }
 
-    updateSummaryFromServer = function(hash){
+    /**
+     * Obtains the summary of the TrasplantOptimitzer identified by the
+     * parameter and updates the summary panel.
+     *
+     * @param {string} hash - Hash of the selected file (is the same as the
+     * TransplantOptimizer represented by).
+     */
+    function updateSummaryFromServer(hash){
         let params = {"id": hash};
 
         $.ajax({
@@ -231,15 +251,15 @@ $(document).ready(function () {
             contentType: false,
             success: updateSummary
         });
-    },
+    }
 
     /**
-     * Actualitza el llistat dels fitxers carregats.
+     * Updates the loaded files panel.
      *
-     * @param {{hash: string}} filesData - informació de fitxers. La clau és el
-     * hash del fitxer i el valor és el nom del fitxer que representa.
+     * @param {{hash: string}} filesData - Loaded files. The key is the
+     * hash of the file and the value is the name of the file that represents.
      */
-    updateFilesTable = function (filesData){
+    function updateFilesTable(filesData){
         let $tableBody = $('#filesTable').find('tbody');
         $tableBody.html('');
 
@@ -261,14 +281,14 @@ $(document).ready(function () {
             }
         }
         return selectedHash;
-    },
+    }
 
     /**
      * Actualitza el llistat de donants altruistes.
      *
-     * @param {Array} altruistsData - array de donants altruistes
+     * @param {Array.<string>} altruistsData - array de donants altruistes
      */
-    updateAltruistsTable = function (altruistsData) {
+    function updateAltruistsTable(altruistsData) {
         currentAltruists = altruistsData.slice();
 
         let $tableBody = $('#altruistsTable').find('tbody');
@@ -300,7 +320,7 @@ $(document).ready(function () {
                 loadPatientChain(patientId, depth);
             });
         }
-    },
+    }
 
     /**
      * Envia la petició al servidor demanant la cadena de trasplantament
@@ -319,7 +339,7 @@ $(document).ready(function () {
      * @param {string} [resultatProvaEncreuada] - parella per la què ha donat
      * positiva la prova encreuada
      */
-    loadPatientChain = function (patientId, depth, ignoraDonant, ignoraReceptor, resultatProvaEncreuada) {
+    function loadPatientChain(patientId, depth, ignoraDonant, ignoraReceptor, resultatProvaEncreuada) {
         let ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
 
         if (ignoraDonant) {
@@ -368,7 +388,7 @@ $(document).ready(function () {
                 dataType: 'json',
                 processData: false,
                 contentType: 'application/json',
-                success: chainFromServer
+                success: updateChains
             });
         }
         else{
@@ -378,20 +398,15 @@ $(document).ready(function () {
             updateChains(cadena);
             $.LoadingOverlay("hide", true);
         }
-    },
-
-    chainFromServer = function(response){
-        updateChains(response.trasplantaments);
-        $.LoadingOverlay("hide", true);
-    },
+    }
 
     /**
      * Actualitza la taula de la cadena de trasplantament amb les dades
      * retornades pel servidor.
      *
-     * @param {Object} dades - dades de la cadena de trasplantament
+     * @param {Chain} dades - dades de la cadena de trasplantament
      */
-    updateChains = function (dades) {
+    function updateChains(dades) {
         let $tableBody = $('#chainsTable').find('tbody');
 
         chainsDataTable.clear();
@@ -447,7 +462,7 @@ $(document).ready(function () {
         $('#data-chains').toggle(true);
         $('#llistats').toggle(true);
         $.LoadingOverlay("hide", true);
-    },
+    }
 
     /**
      * Actualitza el panell de proves encreuades amb les dades passades com
@@ -456,7 +471,7 @@ $(document).ready(function () {
      * @param {Array} dades - array de parelles receptor-donant que han donat
      * positiu en la prova encreuada.
      */
-    updatePanellProvaEncreuada = function (dades) {
+    function updatePanellProvaEncreuada(dades) {
         let $llista = $('#ignora-prova-encreuada tbody');
         $llista.html('');
 
@@ -481,15 +496,15 @@ $(document).ready(function () {
                 loadPatientChain(previousDonor, previousDepth);
             });
         }
-    },
+    }
 
     /**
      * Actualitza el panell de receptors ignorats amb les dades passades com
      * argument
      *
-     * @param {Array} dades - array amb els id dels receptors ignorats
+     * @param {Array.<string>} dades - array amb els id dels receptors ignorats
      */
-    updatePanellReceptorsIgnorats = function (dades) {
+    function updatePanellReceptorsIgnorats(dades) {
         let $llista = $('#ignora-receptors tbody');
         $llista.html('');
 
@@ -512,15 +527,15 @@ $(document).ready(function () {
                 loadPatientChain(previousDonor, previousDepth);
             });
         }
-    },
+    }
 
     /**
      * Actualitza el panell de donants ignorats amb les dades passades com
      * argument.
      *
-     * @param {Array} dades - array amb els id dels donants ignorats
+     * @param {Array.<string>} dades - array amb els id dels donants ignorats
      */
-    updatePanellDonantsIgnorats = function (dades) {
+    function updatePanellDonantsIgnorats(dades) {
         let $llista = $('#ignora-donants tbody');
         $llista.html('');
 
@@ -541,23 +556,23 @@ $(document).ready(function () {
                 loadPatientChain(previousDonor, previousDepth);
             });
         }
-    },
+    }
 
     /**
      * Mostra la secció de càrrega principal.
      */
-    mostrarLoader = function () {
+    function mostrarLoader() {
         $.LoadingOverlay("hide", true);
         $('#file-uploader').toggle(true);
         $('#data-chains').toggle(false);
         $('#llistats').toggle(false);
         $('#data-summary').toggle(false);
-    },
+    }
 
     /**
      * Inicialitza les taules que utilitzen la biblioteca DataTable.
      */
-    inicialitzarTaules = function () {
+    function inicialitzarTaules() {
         let opcions = {
             language: {
                 "sProcessing": "Processant...",
@@ -579,15 +594,19 @@ $(document).ready(function () {
         };
         chainsDataTable = $('#chainsTable').DataTable(opcions);
         updateChainTableHeaders();
-    },
+    }
 
     /**
      * Confirma els trasplantaments fins a l'index passat com argument, de
      * manera que els donants i receptors passan a ser ignorats i s'afegeixen
      * els donants associats a l'últim receptor a la llista de donants
      * altruistres.
+     *
+     * @param {Chain} dades - Cadena de trasplantaments generada.
+     * @param {number} index - Representa l'índex de l'últim pacient el qual
+     * formarà part dels trasplantaments confirmats.
      */
-    confirmarTransplants = function (dades, index) {
+    function confirmarTransplants(dades, index) {
         // Donants associats a l'últim pacient, que correspon amb l'index
         let donantsAssociats = objects[selectedHash].getDonantsDeReceptor(
             dades[index].receptor
@@ -609,21 +628,30 @@ $(document).ready(function () {
         $('#data-chains').toggle(false);
         updatePanellTransplantsConfirmats(confirmats);
 
-    },
+    }
 
     /**
-     * Converteix les dades en un fitxer.
+     * Calls a prompt that allows to download the compatibility graph.
      *
-     * @param {Object} dades - dades actualitzades.
+     * @param {Object} compatibilityGraph - compatibility graph to be
+     * downloaded.
      */
-    descarregarFitxer = function(dades) {
-        let content = JSON.stringify(dades, null, 2);
+    function downloadUpdatedFile(compatibilityGraph) {
+        let content = JSON.stringify(compatibilityGraph, null, 2);
         download(filename, content);
-    },
+    }
 
-    download = function(filename, text){
+    /**
+     * Calls a prompt that allows to download a file.
+     *
+     * @param {string} filename - File name that is going to be downloaded.
+     * @param {string} content - The content of the file.
+     */
+    function download(filename, content){
         let element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute(
+            'href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content)
+        );
         element.setAttribute('download', filename);
 
         element.style.display = 'none';
@@ -632,9 +660,15 @@ $(document).ready(function () {
         element.click();
 
         document.body.removeChild(element);
-    },
+    }
 
-    updatePanellTransplantsConfirmats = function (confirmats) {
+    /**
+     * Updates the confirmed transplants panel.
+     *
+     * @param {Array.<{donant: string, receptor: string}>} confirmats -
+     * Transplants that are confirmed.
+     */
+    function updatePanellTransplantsConfirmats(confirmats) {
         var $llista = $('#transplants-confirmats tbody');
 
         $llista.html('');
@@ -648,9 +682,14 @@ $(document).ready(function () {
 
             $llista.append($row);
         }
-    };
+    }
 
-    // En aquesta secció es posa en marxa l'aplicació
+/* =============================================================================
+ *
+ * Website initialization
+ *
+ * ========================================================================== */
+
     inicialitzarListeners();
     inicialitzarTaules();
     mostrarLoader();
