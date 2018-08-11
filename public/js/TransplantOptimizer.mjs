@@ -1,7 +1,18 @@
 /**
- * Classe que representa una un optimitzador de trasplantaments.
+ * Classe que representa un optimitzador de trasplantaments.
  */
 export default class TransplantOptimizer{
+
+    /**
+     * Llistes que contenen els identificadors (donants o receptors)
+     * @typedef {Array.<string>} Identifiers
+     */
+
+    /**
+     * Llista d'objectes que conté la informació que constitueix una cadena.
+     * @typedef {Array.<{receptor: string, donant: string, probExit: number, valor: number}>} Chain
+     * @
+     */
 
     /**
      *
@@ -26,13 +37,21 @@ export default class TransplantOptimizer{
     /**
      * Inicialitza els receptors creant una còpia del contingut de la memòria i
      * eliminant els receptors passats com argument.
-     * TODO
+     *
+     * @param {Object} [kwargs={}] - Arguments opcionals per inicialitzar els
+     * receptors.
+     * @param {Identifiers} [kwargs.ignoredDonors=[]] - array de id de
+     * donants a ignorar.
+     * @param {Identifiers} [kwargs.ignoredRecipients=[]] - array de id de
+     * receptors a ignorar.
      */
     inicialitzarReceptors(kwargs = {}) {
         let ignoredRecipients = kwargs.ignoredRecipients || [];
         let ignoredDonors = kwargs.ignoredDonors || [];
 
-        this._Recipients = JSON.parse(JSON.stringify(this._CompatibilityGraph.patients));
+        this._Recipients = JSON.parse(
+            JSON.stringify(this._CompatibilityGraph.patients)
+        );
 
         if (ignoredRecipients) {
             for(const ignoredRecipient of ignoredRecipients){
@@ -56,13 +75,16 @@ export default class TransplantOptimizer{
     }
 
     /**
-     *
      * Inicialitza el llistat de donants, a partir dels donants compatibles de
      * la llista de receptors, tenint en compte la llista de donants ignorats.
      *
      * Els receptors associats als donants ignorats són exclosos del llistat de
      * receptors.
-     * TODO
+     *
+     * @param {Object} [kwargs={}] - Arguments opcionals per inicialitzar els
+     * receptors.
+     * @param {Identifiers} [kwargs.ignoredDonors=[]] - array de id de
+     * donants a ignorar.
      */
     inicialitzarDonants(kwargs = {}) {
         let ignoredDonors = kwargs.ignoredDonors || [];
@@ -156,7 +178,7 @@ export default class TransplantOptimizer{
      * el donant corresponent al id passat com argument.
      *
      * @param {string} donorId - id del donant
-     * @returns {Array} - array amb els identificadors dels receptors
+     * @returns {Identifiers} - array amb els identificadors dels receptors
      * compatibles amb el donant.
      */
     succDonant(donorId) {
@@ -186,8 +208,10 @@ export default class TransplantOptimizer{
     /**
      * Retorna la puntuació de trasplantament entre el parell donant-receptor
      *
-     * @param {Object} parell - tupla que conté la informació d'un donant i
+     * @param {Object} parell - Objecte que conté la informació d'un donant i
      * un receptor
+     * @param {string} parell.donant - Identificador del donant.
+     * @param {string} parell.receptor - Identificador del receptor
      * @returns {number} - puntuació del trasplantament
      */
     scoreMultipleDonors(parell) {
@@ -198,8 +222,8 @@ export default class TransplantOptimizer{
      * Retorna la puntuació de trasplantament entre el donant i el receptor
      * passats com argument.
      *
-     * @param {number} donant - id del donant
-     * @param {number} receptor - id del receptor
+     * @param {string} donant - id del donant
+     * @param {string} receptor - id del receptor
      * @returns {number} - puntuació del trasplantament
      * @private
      */
@@ -207,10 +231,8 @@ export default class TransplantOptimizer{
         let puntuacio;
 
         if (!this._Donors[donant][receptor]) {
-            this._Log.errors.push(
-                "El receptor [" + receptor +
-                "]no és compatible amb el donant [" + donant + "]"
-            );
+            let error = "El receptor {} no és compatible amb el donant {}".format(receptor, donant);
+            this._Log.errors.push(error);
         } else {
             puntuacio = this._Donors[donant][receptor].score;
         }
@@ -268,8 +290,8 @@ export default class TransplantOptimizer{
      * rec)
      *
      * @param {number} rec - id del receptor
-     * @param {Array} rec_list - array amb els id dels elements a ignorar (els
-     * receptors processats anteriorment)
+     * @param {Identifiers} rec_list - array amb els id dels elements a
+     * ignorar (els receptors processats anteriorment)
      * @param {number} depth - profunditat a explorar.
      */
     ExpUtMultipleDonors(rec, rec_list, depth) {
@@ -351,15 +373,17 @@ export default class TransplantOptimizer{
      *
      * @param {number} depth - profunditat màxima a explorar.
      * @param {string} altruist - id del donant altruista que inicia la cadena.
-     * @param {Object} [kwargs] - arguments opcionals per construir la cadena.
-     * @param {Array} [kwargs.ignoredDonors] - array de id de donants a ignorar.
-     * @param {Array} [kwargs.ignoredRecipients] - array de id de receptors a
+     * @param {Object} [kwargs={}] - arguments opcionals per construir la
+     * cadena.
+     * @param {Array} [kwargs.ignoredDonors=[]] - array de id de donants a
      * ignorar.
-     * @param {Array} [kwargs.crossedTests] - array de cadenes de text amb
+     * @param {Array} [kwargs.ignoredRecipients=[]] - array de id de receptors a
+     * ignorar.
+     * @param {Array} [kwargs.crossedTests=[]] - array de cadenes de text amb
      * les parelles de la prova encreuada que han donat positiu.
-     * @param {Array} [kwargs.ignoreFailureProbability] - indica si es ignora la
-     * probabilitat de fallada.
-     * @returns {Array} - array de tuples amb les dades de trasplantament.
+     * @param {Array} [kwargs.ignoreFailureProbability=false] - indica si es
+     * ignora la probabilitat de fallada.
+     * @returns {Chain} - array de tuples amb les dades de trasplantament.
      * @public
      */
     buildChain(depth, altruist, kwargs = {}) {
@@ -504,49 +528,37 @@ export default class TransplantOptimizer{
      * Obtains the related donors of the recipient passed by parameter.
      *
      * @param recipientId
-     * @returns {number[]}
+     * @returns {Array.<string>}
      */
     getDonantsDeReceptor(recipientId) {
         return this._CompatibilityGraph.patients[recipientId].related_donors;
     }
 
     /**
+     * Obtains *this' hash code. No matter what, the hash code will remain
+     * always the same because this class is considered inmutable.
      *
-     * @param string
-     * @returns {number}
-     */
-    static _computeHashCode(string) {
-        //TODO seria millor posar-lo en un altre lloc, crec →
-        // al prototype d'String
-        let hash = 0, i, chr;
-        if (string.length === 0) return hash;
-        for (i = 0; i < string.length; i++) {
-            chr   = string.charCodeAt(i);
-            hash  = ((hash << 5) - hash) + chr;
-            hash |= 0; // Convert to 32bit integer
-        }
-        return hash;
-    }
-
-    /**
+     * The hash code of *this is the same as the compatibility graph.
      *
-     * @returns {boolean}
+     * @returns {number} - Hash code of *this.
      */
     get hashCode(){
         //TODO esta representacion del hashcode indica que el objeto seria como
         // inmutable, asi le cambiemos el loadedData (Que no se como se podria)
         // siempre retornaria el mismo hashcode.
         if (!this._HashCodeComputed){
-            this._HashCodeComputed = TransplantOptimizer._computeHashCode(
-                JSON.stringify(this._CompatibilityGraph)
+            let compatibilityGraphAsString = JSON.stringify(
+                this._CompatibilityGraph
             );
+            this._HashCodeComputed = compatibilityGraphAsString.hashCode();
         }
         return this._HashCodeComputed;
     }
 
     /**
-     * 
-     * @returns {*}
+     * Obtains the log as the result of calculating the transplant's chain.
+     *
+     * @returns {string}
      */
     get log(){
         let logAsText =  ">LOG: {}\n".format(Utils.currentDateTime);
@@ -570,8 +582,10 @@ export default class TransplantOptimizer{
     }
 
     /**
+     * Obtains the origin, description and altruists from de compatibility
+     * graph.
      *
-     * @returns {{origin: *, description: *, altruists: (string[]|number[])}}
+     * @returns {{origin: string, description: string, altruists: (string[])}}
      */
     get summary(){
         return {
@@ -582,8 +596,10 @@ export default class TransplantOptimizer{
     }
 
     /**
+     * Obtains the updated compatibility graph according to the ignored donors
+     * and the ignored recipients.
      *
-     * @returns {any}
+     * @returns {Object} - Updated compatibility graph.
      */
     get update(){
         //fem una copia
