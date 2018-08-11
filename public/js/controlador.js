@@ -12,6 +12,7 @@ $(document).ready(function () {
         serverSide = false,
         descendent = true,
         selectedHash = false,
+        fileName = {},
         objects = {};
 
     /**
@@ -99,20 +100,20 @@ $(document).ready(function () {
                         let f = files[i];
                         let fr = new FileReader();
                         fr.onload = (function(file){
-                            let fileName = file.name;
+                            let nomFitxer = file.name;
                             // imperativo entender como leches funciona esto
                             // https://stackoverflow.com/questions/16937223/pass-a-parameter-to-filereader-onload-event
                             return function(e){
                                 let object = new OptimitzadorTransplants(JSON.parse(e.target.result), descendent);
                                 objects[object.hashCode()] = object;
-                                filesData[object.hashCode().toString()] = fileName;
+                                filesData[object.hashCode().toString()] = nomFitxer;
                                 if(!selectedHash){
                                     // The default selected file is the first
                                     // on to be loaded
                                     selectedHash = object.hashCode();
                                 }
                                 if(i === files.length - 1){
-                                    // TODO
+                                    fileName = filesData;
                                     updateFilesTable(filesData);
                                     updateSummary(objects[selectedHash].getSummary());
                                 }
@@ -201,7 +202,7 @@ $(document).ready(function () {
         $('.progress').toggle(false);
         $('#originNode').html(summary.origin);
         $('#descriptionNode').html(summary.description);
-        $('#fitxerNode').html("NOMBRE DEL ARCHIVO"); //summary.filename TODO compte, aixo no hi es al fitxer
+        $('#fitxerNode').html(fileName[selectedHash]);
 
         originalAltruists = summary.altruists;
         updateAltruistsTable(summary.altruists.slice());
@@ -213,6 +214,7 @@ $(document).ready(function () {
     },
 
     updateIdentifiers = function(response){
+        fileName = response;
         updateFilesTable(response);
         updateSummaryFromServer(selectedHash);
         $.LoadingOverlay("hide", true);
