@@ -357,7 +357,7 @@ export default class TransplantOptimizer{
      * ignorar.
      * @param {Array} [kwargs.crossedTests] - array de cadenes de text amb
      * les parelles de la prova encreuada que han donat positiu.
-     * @param {Array} [kwargs.ignorarFallada] - indica si es ignora la
+     * @param {Array} [kwargs.ignoreFailureProbability] - indica si es ignora la
      * probabilitat de fallada.
      * @returns {Array} - array de tuples amb les dades de trasplantament.
      * @public
@@ -370,7 +370,7 @@ export default class TransplantOptimizer{
 
         this._IgnoredDonors = [];
         this._IgnoredRecipients = [];
-        this._IgnoreFailureProbability = kwargs.ignorarFallada || false;
+        this._IgnoreFailureProbability = kwargs.ignoreFailureProbability || false;
 
         this.inicialitzarReceptors(kwargs);
         this.inicialitzarDonants(kwargs);

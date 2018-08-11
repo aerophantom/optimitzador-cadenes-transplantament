@@ -1,9 +1,11 @@
+"use strict";
+
 var express = require('express');
 var app = express();
 var path = require('path');
 var formidable = require('formidable');
 var fs = require('fs');
-var Lib = require('./public/js/optimitzador-transplants.js');
+import TransplantOptimizer from './public/js/TransplantOptimizer';
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({
@@ -64,24 +66,15 @@ app.put('/cadena-trasplantaments', function (req, res){
     let id = req.body.id;
     let depth = req.body.profunditat;
     let patient = req.body.pacient;
-    let donantsIgnorats = req.body.donantsIgnorats;
-    let receptorsIgnorats = req.body.receptorsIgnorats;
-    let provesEncreuades = req.body.provesEncreuades;
-    let ignorarFallada = req.body.ignorarFallada;
 
-    if (donantsIgnorats.length === 0){
-        donantsIgnorats = false;
-    }
-    if (receptorsIgnorats.length === 0){
-        receptorsIgnorats = false;
-    }
-    if (provesEncreuades.length === 0){
-        provesEncreuades = false;
-    }
+    let kwargs = {
+        ignoredDonors: req.body.donantsIgnorats,
+        ignoredRecipients: req.body.receptorsIgnorats,
+        crossedTests: req.body.provesEncreuades,
+        ignoreFailureProbability: req.body.ignorarFallada
+    };
 
-    let result = objects[id].buildChain(
-        depth, patient, donantsIgnorats, receptorsIgnorats, provesEncreuades, ignorarFallada
-    );
+    let result = objects[id].buildChain(depth, patient, kwargs);
     let responseData = {
         status: "success",
         message: "chain calculated succesfully",
@@ -93,18 +86,22 @@ app.put('/cadena-trasplantaments', function (req, res){
 
 app.get('/resum', function (req, res){
     let id = req.query.id;
-    let responseData = objects[id].getSummary();
+    let responseData = objects[id].summary;
     res.type('json');
     res.end(JSON.stringify(responseData));
 });
 
 app.get('/fitxer', function (req, res){
     let id = req.query.id;
-    let responseData = objects[id].update();
+    let responseData = objects[id].update;
     res.type('json');
     res.end(JSON.stringify(responseData));
 });
 
+/**
+ *
+ * @type {{string: TransplantOptimizer}}
+ */
 var objects = {}; // Dades carregades a la memòria
 /**
  * Analitza el fitxer localitzat a la ruta especificada carregant les dades a memòria i seguidament l'esborra.
@@ -116,8 +113,8 @@ function parseDataFile(ruta) {
     let id = undefined;
     try {
         let data = JSON.parse(fs.readFileSync(ruta, 'utf8'));
-        let object = new Lib.OptimitzadorTransplantsLib(data, true);
-        id = object.hashCode();
+        let object = new TransplantOptimizer(data);
+        id = object.hashCode;
         objects[id] = object;
     } catch (e) {
         console.error(e);
@@ -134,7 +131,7 @@ function parseDataFile(ruta) {
  * Aquesta secció inicia l'aplicació com a servidor HTTP.
  *
  * ================================================================================================================ */
-var port = 80;
+var port = 8069;
 var server = app.listen(port, function () {
     console.log('Servidor escoltant al port ' + port);
 });
