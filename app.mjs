@@ -1,18 +1,16 @@
-"use strict";
-
-var express = require('express');
+import express from 'express';
 var app = express();
-var path = require('path');
-var formidable = require('formidable');
-var fs = require('fs');
+import path from 'path';
+import formidable from 'formidable';
+import fs from 'fs';
 import TransplantOptimizer from './public/js/TransplantOptimizer';
-const bodyParser = require('body-parser');
-
+import bodyParser from 'body-parser';
+console.log(import.meta);
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(import.meta, 'public')));
 /* ================================================================================================================
  * La documentació de l'API es pot trobar a: https://app.apiary.io/trasplantaments
  * Aquesta secció correspon a l'encaminament i accepta les següents rutes:
@@ -25,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
  * ================================================================================================================ */
 
 app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, 'views/index.html'));
+    res.sendFile(path.join(import.meta, 'views/index.html'));
 });
 
 app.post('/cadena-trasplantaments', function (req, res){
@@ -36,7 +34,7 @@ app.post('/cadena-trasplantaments', function (req, res){
     form.multiples = true;
 
     // store all uploads in the /uploads directory
-    form.uploadDir = path.join(__dirname, '/uploads');
+    form.uploadDir = path.join(import.meta, '/uploads');
 
     form.on('error', function (err) {
         console.log('Error:: \n' + err);
