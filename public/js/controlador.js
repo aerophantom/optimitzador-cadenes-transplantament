@@ -107,15 +107,16 @@ $(document).ready(function () {
                                 objects[object.hashCode()] = object;
                                 filesData[object.hashCode().toString()] = fileName;
                                 if(!selectedHash){
-                                    //TODO  de momento consideramos solamente el primer fichero
+                                    // The default selected file is the first
+                                    // on to be loaded
                                     selectedHash = object.hashCode();
                                 }
                                 if(i === files.length - 1){
+                                    // TODO
+                                    updateFilesTable(filesData);
                                     updateSummary(objects[selectedHash].getSummary());
-                                    //TODO Estaba haciendo esto. tengo que pasarle el name del file.
-                                    updateFilesTable(filesData)
                                 }
-                            }
+                            };
                         })(f);
                         fr.readAsText(f);
                     }
@@ -140,7 +141,8 @@ $(document).ready(function () {
     },
 
     /**
-     * Actualitza les capçaleres de la taula de la cadena de trasplantaments segons l'amplada de la pantalla
+     * Actualitza les capçaleres de la taula de la cadena de trasplantaments
+     * segons l'amplada de la pantalla
      */
     updateChainTableHeaders = function() {
         let width = $(window).width();
@@ -156,16 +158,6 @@ $(document).ready(function () {
             $headers.get(1).innerHTML = "Donant";
             $headers.get(2).innerHTML = "Receptor";
         }
-    },
-
-    /**
-     * Reinicialitza totes les llistes
-     */
-    resetLlistes = function () {
-        resetLlista('confirmats');
-        resetLlista('proves');
-        resetLlista('receptors');
-        resetLlista('donants');
     },
 
     /**
@@ -199,7 +191,8 @@ $(document).ready(function () {
     },
 
     /**
-     * Actualitza el resum de les dades carregades amb la informació passada com argument.
+     * Actualitza el resum de les dades carregades amb la informació passada
+     * com argument.
      *
      * @param {Object} summary - diccionari de dades
      */
@@ -241,7 +234,8 @@ $(document).ready(function () {
     /**
      * Actualitza el llistat dels fitxers carregats.
      *
-     * @param {Object} filesData - informació de fitxers (clau: hash, valor: nom)
+     * @param {{hash: string}} filesData - informació de fitxers. La clau és el
+     * hash del fitxer i el valor és el nom del fitxer que representa.
      */
     updateFilesTable = function (filesData){
         let $tableBody = $('#filesTable').find('tbody');
@@ -307,18 +301,21 @@ $(document).ready(function () {
     },
 
     /**
-     * Envia la petició al servidor demanant la cadena de trasplantament optimizada pel donant passat com argument
-     * afegint al llistat corresponent el donant ignorat, el receptor ignorat o el resultat positiu de la prova
-     * encreuada.
+     * Envia la petició al servidor demanant la cadena de trasplantament
+     * optimizada pel donant passat com argument afegint al llistat
+     * corresponent el donant ignorat, el receptor ignorat o el resultat
+     * positiu de la prova encreuada.
      *
-     * La petició tindrà en compte els llistats de donants i receptors ignorats, la profunditat i els resultats de
-     * la prova encreuada, incloent-hi els nous elements passats com argument.
+     * La petició tindrà en compte els llistats de donants i receptors
+     * ignorats, la profunditat i els resultats de la prova encreuada,
+     * incloent-hi els nous elements passats com argument.
      *
      * @param {number} patientId - id del donant
      * @param {number} depth - profunditat a explorar
      * @param {number} [ignoraDonant] - id del nou donant a ignorar
      * @param {number} [ignoraReceptor] - id del nou receptor a ignorar
-     * @param {string} [resultatProvaEncreuada] - parella per la què ha donat positiva la prova encreuada
+     * @param {string} [resultatProvaEncreuada] - parella per la què ha donat
+     * positiva la prova encreuada
      */
     loadPatientChain = function (patientId, depth, ignoraDonant, ignoraReceptor, resultatProvaEncreuada) {
         let ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
@@ -341,7 +338,8 @@ $(document).ready(function () {
 
         $.LoadingOverlay("show");
 
-        // Creem una copia dels arrays de donants i receptors ignorats per no modificar els originals
+        // Creem una copia dels arrays de donants i receptors ignorats per no
+        // modificar els originals
         let auxIgnoraDonants = ignoraDonants.slice();
         let auxIgnoraReceptors = ignoraReceptors.slice();
 
@@ -386,7 +384,8 @@ $(document).ready(function () {
     },
 
     /**
-     * Actualitza la taula de la cadena de trasplantament amb les dades retornades pel servidor.
+     * Actualitza la taula de la cadena de trasplantament amb les dades
+     * retornades pel servidor.
      *
      * @param {Object} dades - dades de la cadena de trasplantament
      */
@@ -418,7 +417,7 @@ $(document).ready(function () {
             let $donantIcon = $row.find('[data-donant-id]');
             $donantIcon.on('click', function () {
                 let donantId = $(this).attr('data-donant-id');
-                loadPatientChain(previousDonor, previousDepth, donantId)
+                loadPatientChain(previousDonor, previousDepth, donantId);
             });
 
             let $receptorIcon = $row.find('[data-receptor-id]');
@@ -431,7 +430,7 @@ $(document).ready(function () {
 
             $provaEncreuadaIcon.on('click', function () {
                 let provaEncreuadaId = $(this).attr('data-prova-encreuada-id');
-                loadPatientChain(previousDonor, previousDepth, null, null, provaEncreuadaId)
+                loadPatientChain(previousDonor, previousDepth, null, null, provaEncreuadaId);
             });
 
             let $confirmarIcon = $row.find('[data-confirmar-index]');
@@ -449,9 +448,11 @@ $(document).ready(function () {
     },
 
     /**
-     * Actualitza el panell de proves encreuades amb les dades passades com argument.
+     * Actualitza el panell de proves encreuades amb les dades passades com
+     * argument.
      *
-     * @param {Array} dades - array de parelles receptor-donant que han donat positiu en la prova encreuada.
+     * @param {Array} dades - array de parelles receptor-donant que han donat
+     * positiu en la prova encreuada.
      */
     updatePanellProvaEncreuada = function (dades) {
         let $llista = $('#ignora-prova-encreuada tbody');
@@ -481,7 +482,8 @@ $(document).ready(function () {
     },
 
     /**
-     * Actualitza el panell de receptors ignorats amb les dades passades com argument
+     * Actualitza el panell de receptors ignorats amb les dades passades com
+     * argument
      *
      * @param {Array} dades - array amb els id dels receptors ignorats
      */
@@ -511,7 +513,8 @@ $(document).ready(function () {
     },
 
     /**
-     * Actualitza el panell de donants ignorats amb les dades passades com argument.
+     * Actualitza el panell de donants ignorats amb les dades passades com
+     * argument.
      *
      * @param {Array} dades - array amb els id dels donants ignorats
      */
@@ -577,11 +580,16 @@ $(document).ready(function () {
     },
 
     /**
-     * Confirma els trasplantaments fins a l'index passat com argument, de manera que els donants i receptors passan
-     * a ser ignorats i s'afegeixen els donants associats a l'últim receptor a la llista de donants altruistres.
+     * Confirma els trasplantaments fins a l'index passat com argument, de
+     * manera que els donants i receptors passan a ser ignorats i s'afegeixen
+     * els donants associats a l'últim receptor a la llista de donants
+     * altruistres.
      */
     confirmarTransplants = function (dades, index) {
-        let donantsAssociats = objects[selectedHash].getDonantsDeReceptor(dades[index].receptor); // Donants associats a l'últim pacient, que correspon amb l'index
+        // Donants associats a l'últim pacient, que correspon amb l'index
+        let donantsAssociats = objects[selectedHash].getDonantsDeReceptor(
+            dades[index].receptor
+        );
         let altruistaActual = Number(dades[0].donant);
         let indexAltruistaActual = currentAltruists.indexOf(altruistaActual);
         currentAltruists.splice(indexAltruistaActual, 1);
