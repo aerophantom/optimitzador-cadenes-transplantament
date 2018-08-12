@@ -1,7 +1,7 @@
 /**
  * Class that contains useful functions.
  */
-class Utils{
+export default class Utils{
 
     /**
      * Obtains the current datetime MySQL formatted.
