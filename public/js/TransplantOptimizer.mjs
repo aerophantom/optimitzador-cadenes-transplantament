@@ -34,6 +34,7 @@ export default class TransplantOptimizer{
             "crossed_tests": [],
             "errors": []
         };
+        this._secondsElapsed = 0;
     }
 
     /**
@@ -401,6 +402,7 @@ export default class TransplantOptimizer{
         this.inicialitzarReceptors(kwargs);
         this.inicialitzarDonants(kwargs);
 
+        let startTime = new Date();
         do {
             let S;
             if (current === altruist) {
@@ -454,7 +456,10 @@ export default class TransplantOptimizer{
             }
 
         } while (!no_more_transplantations);
-
+        let endTime = new Date();
+        let timeDiff = endTime - startTime; // in ms
+        timeDiff /= 1000;
+        this._secondsElapsed = Math.round(timeDiff);
         this._Log.candidates = cadenaTransplants;
         return cadenaTransplants;
     }
@@ -561,6 +566,7 @@ export default class TransplantOptimizer{
      */
     get log(){
         let logAsText =  ">LOG: {}\n".format(Utils.currentDateTime);
+        logAsText += "HASH FITXER ORIGINAL: {}\n".format(this.hashCode);
         logAsText += ">TRASPLANTAMENTS:\n";
         logAsText += "DONANT;RECEPTOR;PROBABILITAT_EXIT;VALOR\n";
 
@@ -570,13 +576,29 @@ export default class TransplantOptimizer{
                 transplantation.probExit, transplantation.valor
             );
         }
+        logAsText += ">PARAMETRITZACIÓ\n";
+        let ignoraProabilitat = "fals";
+        if(this._IgnoreFailureProbability){
+            ignoraProabilitat = "cert";
+        }
+        logAsText += ">>IGNORAR PROBABILITAT FALLADA: {}\n".format(
+            ignoraProabilitat
+        );
+        logAsText += ">>DONANTS IGNORATS\n";
+        for(const ignoredDonor of this._IgnoredDonors){
+            logAsText += ignoredDonor;
+        }
+        logAsText += ">>RECEPTORS IGNORATS\n";
+        for(const ignoredRecipient of this._IgnoredRecipients){
+            logAsText += ignoredRecipient;
+        }
 
-        logAsText += ">POSITIUS PROVES CREUADES\n";
+        logAsText += ">>POSITIUS PROVES CREUADES\n";
         logAsText += "DONANT;RECEPTOR\n";
         for(const positive of this._Log.crossed_tests){
             logAsText += "{};{}\n".format(positive.donor, positive.receiver);
         }
-
+        logAsText += "\nTime elapsed: {} s".format(this._secondsElapsed);
         return logAsText;
     }
 

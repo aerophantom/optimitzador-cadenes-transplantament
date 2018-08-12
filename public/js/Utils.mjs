@@ -37,6 +37,24 @@ export default class Utils{
         }
         return year+'/'+month+'/'+day+' '+hour+':'+minute+':'+second;
     }
+
+    /**
+     * Obtains the compatibility graph formatted to be used on the app.
+     *
+     * @param {object} compatibilityGraph
+     */
+    static toAppFormat(compatibilityGraph){
+        compatibilityGraph.altruists = compatibilityGraph.altruists.map(String);
+        let patients = compatibilityGraph.patients;
+
+        for(let patientId in patients){
+            let patient = patients[patientId];
+            patient.related_donors = patient.related_donors.map(String);
+            for(let compatible_donor of patient.compatible_donors){
+                compatible_donor.donor = compatible_donor.donor.toString();
+            }
+        }
+    }
 }
 
 /**

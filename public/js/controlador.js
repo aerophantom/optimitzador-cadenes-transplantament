@@ -1,4 +1,5 @@
 import TransplantOptimizer from "./TransplantOptimizer.mjs";
+import Utils from "./Utils.mjs";
 
 $(document).ready(function () {
 
@@ -139,6 +140,7 @@ $(document).ready(function () {
                                 let compatibilityGraph = JSON.parse(
                                     e.target.result
                                 );
+                                Utils.toAppFormat(compatibilityGraph);
                                 let object = new TransplantOptimizer(
                                     compatibilityGraph
                                 );

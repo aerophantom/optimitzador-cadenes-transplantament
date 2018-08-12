@@ -6,6 +6,7 @@ import formidable from 'formidable';
 import fs from 'fs';
 import TransplantOptimizer from './public/js/TransplantOptimizer';
 import bodyParser from 'body-parser';
+import Utils from "./public/js/Utils";
 
 /* =============================================================================
  *
@@ -133,8 +134,9 @@ app.get('/log', function (req, res){
 function parseDataFile(ruta) {
     let id;
     try {
-        let data = JSON.parse(fs.readFileSync(ruta, 'utf8'));
-        let object = new TransplantOptimizer(data);
+        let compatibilityGraph = JSON.parse(fs.readFileSync(ruta, 'utf8'));
+        Utils.toAppFormat(compatibilityGraph);
+        let object = new TransplantOptimizer(compatibilityGraph);
         id = object.hashCode;
         objects[id] = object;
     } catch (e) {
