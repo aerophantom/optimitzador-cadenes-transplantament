@@ -1,3 +1,5 @@
+import TransplantOptimizer from "./TransplantOptimizer.mjs";
+
 $(document).ready(function () {
 
     /**
@@ -20,6 +22,11 @@ $(document).ready(function () {
         descendent = true,
         selectedHash = false,
         fileName = {},
+        /**
+         * Key: TransplantOptimizer hash code; Value: TransplantOptimitzer
+         * object.
+         * @type {{}}
+         */
         objects = {};
 
     /**
@@ -44,7 +51,7 @@ $(document).ready(function () {
                 });
             }
             else{
-                downloadUpdatedFile(objects[selectedHash].update());
+                downloadUpdatedFile(objects[selectedHash].update);
                 //TODO: Agregar boton para descargar el log.
                 // download("log.txt", objects[selectedHash].getLog());
             }
@@ -111,18 +118,24 @@ $(document).ready(function () {
                             // imperativo entender como leches funciona esto
                             // https://stackoverflow.com/questions/16937223/pass-a-parameter-to-filereader-onload-event
                             return function(e){
-                                let object = new OptimitzadorTransplants(JSON.parse(e.target.result), descendent);
-                                objects[object.hashCode()] = object;
-                                filesData[object.hashCode().toString()] = nomFitxer;
+                                let compatibilityGraph = JSON.parse(
+                                    e.target.result
+                                );
+                                let object = new TransplantOptimizer(
+                                    compatibilityGraph
+                                );
+                                let hash = object.hashCode;
+                                objects[hash] = object;
+                                filesData[hash.toString()] = nomFitxer;
                                 if(!selectedHash){
                                     // The default selected file is the first
                                     // on to be loaded
-                                    selectedHash = object.hashCode();
+                                    selectedHash = hash;
                                 }
                                 if(i === files.length - 1){
                                     fileName = filesData;
                                     updateFilesTable(filesData);
-                                    updateSummary(objects[selectedHash].getSummary());
+                                    updateSummary(objects[selectedHash].summary);
                                 }
                             };
                         })(f);
@@ -273,7 +286,7 @@ $(document).ready(function () {
                     updateSummaryFromServer(selectedHash);
                 }
                 else{
-                    updateSummary(objects[selectedHash].getSummary());
+                    updateSummary(objects[selectedHash].summary);
                 }
             });
             if(!selectedHash){
@@ -334,24 +347,26 @@ $(document).ready(function () {
      *
      * @param {number} patientId - id del donant
      * @param {number} depth - profunditat a explorar
-     * @param {number} [ignoraDonant] - id del nou donant a ignorar
-     * @param {number} [ignoraReceptor] - id del nou receptor a ignorar
-     * @param {string} [resultatProvaEncreuada] - parella per la què ha donat
-     * positiva la prova encreuada
+     * @param {object} [kwargs={}] - Paràmetres opcionals alhora de calcular la
+     * cadena de trasplantaments.
+     * @param {number} [kwargs.ignoraDonant] - id del nou donant a ignorar.
+     * @param {number} [kwargs.ignoraReceptor] - id del nou receptor a ignorar.
+     * @param {string} [kwargs.resultatProvaEncreuada] - parella per la què ha
+     * donat positiva la prova encreuada.
      */
-    function loadPatientChain(patientId, depth, ignoraDonant, ignoraReceptor, resultatProvaEncreuada) {
+    function loadPatientChain(patientId, depth, kwargs = {}) {
         let ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
 
-        if (ignoraDonant) {
-            ignoraDonants.push(ignoraDonant);
+        if (kwargs.ignoraDonant) {
+            ignoraDonants.push(kwargs.ignoraDonant);
             updatePanellDonantsIgnorats(ignoraDonants);
         }
-        if (ignoraReceptor) {
-            ignoraReceptors.push(ignoraReceptor);
+        if (kwargs.ignoraReceptor) {
+            ignoraReceptors.push(kwargs.ignoraReceptor);
             updatePanellReceptorsIgnorats(ignoraReceptors);
         }
-        if (resultatProvaEncreuada) {
-            resultatsProvaEncreuada.push(resultatProvaEncreuada);
+        if (kwargs.resultatProvaEncreuada) {
+            resultatsProvaEncreuada.push(kwargs.resultatProvaEncreuada);
             updatePanellProvaEncreuada(resultatsProvaEncreuada);
         }
 
@@ -392,8 +407,14 @@ $(document).ready(function () {
             });
         }
         else{
+            let optionalParameters = {
+                ignoredDonors: auxIgnoraDonants,
+                ignoredRecipients: auxIgnoraReceptors,
+                crossedTests: resultatsProvaEncreuada,
+                ignoreFailureProbability: ignorarFallada
+            };
             let cadena = objects[selectedHash].buildChain(
-                depth, patientId, auxIgnoraDonants, auxIgnoraReceptors, resultatsProvaEncreuada, ignorarFallada
+                depth, patientId, optionalParameters
             );
             updateChains(cadena);
             $.LoadingOverlay("hide", true);
@@ -434,20 +455,23 @@ $(document).ready(function () {
             let $donantIcon = $row.find('[data-donant-id]');
             $donantIcon.on('click', function () {
                 let donantId = $(this).attr('data-donant-id');
-                loadPatientChain(previousDonor, previousDepth, donantId);
+                let kwargs = {ignoraDonant: donantId};
+                loadPatientChain(previousDonor, previousDepth, kwargs);
             });
 
             let $receptorIcon = $row.find('[data-receptor-id]');
             $receptorIcon.on('click', function () {
                 let receptorId = $(this).attr('data-receptor-id');
-                loadPatientChain(previousDonor, previousDepth, null, receptorId);
+                let kwargs = {ignoraReceptor: receptorId};
+                loadPatientChain(previousDonor, previousDepth, kwargs);
             });
 
             let $provaEncreuadaIcon = $row.find('[data-prova-encreuada-id]');
 
             $provaEncreuadaIcon.on('click', function () {
                 let provaEncreuadaId = $(this).attr('data-prova-encreuada-id');
-                loadPatientChain(previousDonor, previousDepth, null, null, provaEncreuadaId);
+                let kwargs = {resultatProvaEncreuada: provaEncreuadaId};
+                loadPatientChain(previousDonor, previousDepth, kwargs);
             });
 
             let $confirmarIcon = $row.find('[data-confirmar-index]');
