@@ -1,4 +1,4 @@
-import Utils from './Utils';
+import Utils from './Utils.js';
 
 /**
  * Classe que representa un optimitzador de trasplantaments.
@@ -377,10 +377,10 @@ export default class TransplantOptimizer{
      * @param {string} altruist - id del donant altruista que inicia la cadena.
      * @param {Object} [kwargs={}] - arguments opcionals per construir la
      * cadena.
-     * @param {Array} [kwargs.ignoredDonors=[]] - array de id de donants a
-     * ignorar.
-     * @param {Array} [kwargs.ignoredRecipients=[]] - array de id de receptors a
-     * ignorar.
+     * @param {Identifiers} [kwargs.ignoredDonors=[]] - array de id de donants
+     * a ignorar.
+     * @param {Identifiers} [kwargs.ignoredRecipients=[]] - array de id de
+     * receptors a ignorar.
      * @param {Array} [kwargs.crossedTests=[]] - array de cadenes de text amb
      * les parelles de la prova encreuada que han donat positiu.
      * @param {Array} [kwargs.ignoreFailureProbability=false] - indica si es
