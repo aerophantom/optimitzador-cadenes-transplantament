@@ -135,20 +135,6 @@ let file = {
     }
 };
 
-test('build chain with crossed test', t => {
-    let to = new TransplantOptimizer(file);
-    let kwargs = {"crossedTests": ["2003-3001"]};
-    let chain = to.buildChain(3, "1000", kwargs);
-    for (const transplant of chain) {
-        if (transplant.donant === "3001" && transplant.receptor === "2003") {
-            t.fail('The final chain contains the transplant with 2003 as ' +
-                'donor and 2003 as recipient'
-            );
-        }
-    }
-    t.pass();
-});
-
 test('initialize recipients', t => {
     let to = new TransplantOptimizer(file);
     to.inicialitzarReceptors();
@@ -369,6 +355,24 @@ test('build chain ignoring recipient', t => {
     t.is(chain[3].donant, "3002");
 });
 
+test('build chain ignoring donor', t => {
+    let to = new TransplantOptimizer(file);
+    let kwargs = {ignoredDonors: ["3007"]};
+    let chain = to.buildChain(3, "1000", kwargs);
+    t.is(chain.length, 5);
+    t.is(chain[0].receptor, "2000");
+    t.is(chain[0].donant, "1000");
+    t.is(chain[1].receptor, "2003");
+    t.is(chain[1].donant, "3001");
+    t.is(chain[2].receptor, "2002");
+    t.is(chain[2].donant, "3006");
+    t.is(chain[3].receptor, "2001");
+    t.is(chain[3].donant, "3003");
+    t.is(chain[4].receptor, "2004");
+    t.is(chain[4].donant, "3002");
+});
+
+
 test('build chain ignoring the altruist donor', t => {
     let to = new TransplantOptimizer(file);
     let kwargs = {ignoredDonors: ["1000"]};
@@ -381,4 +385,18 @@ test('build chain ignoring the main recipient', t => {
     let kwargs = {ignoredRecipients: ["2000"]};
     let chain = to.buildChain(3, "1000", kwargs);
     t.is(chain.length, 0);
+});
+
+test('build chain with crossed test', t => {
+    let to = new TransplantOptimizer(file);
+    let kwargs = {"crossedTests": ["2003-3001"]};
+    let chain = to.buildChain(3, "1000", kwargs);
+    for (const transplant of chain) {
+        if (transplant.donant === "3001" && transplant.receptor === "2003") {
+            t.fail('The final chain contains the transplant with 2003 as ' +
+                'donor and 2003 as recipient'
+            );
+        }
+    }
+    t.pass();
 });
