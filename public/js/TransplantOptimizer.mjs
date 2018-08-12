@@ -1,4 +1,4 @@
-import Utils from './Utils.js';
+import Utils from './Utils.mjs';
 
 /**
  * Classe que representa un optimitzador de trasplantaments.
