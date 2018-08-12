@@ -110,6 +110,13 @@ app.get('/fitxer', function (req, res){
     res.end(JSON.stringify(responseData));
 });
 
+app.get('/log', function (req, res){
+    let id = req.query.id;
+    let responseData = objects[id].log;
+    res.type('text');
+    res.end(JSON.stringify(responseData));
+});
+
 /* =============================================================================
  *
  * Helper functions

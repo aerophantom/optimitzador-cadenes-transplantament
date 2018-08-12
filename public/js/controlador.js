@@ -9,6 +9,8 @@ $(document).ready(function () {
      */
 
     const filename = "UpdatedObject.json";
+    const logname = "log.txt";
+
     let ignoraDonants = [],
         ignoraReceptors = [],
         resultatsProvaEncreuada = [],
@@ -34,10 +36,10 @@ $(document).ready(function () {
     function inicialitzarListeners() {
         let $upload_input = $('.upload-input');
         let $progress_bar = $('.progress-bar');
-        let $download = $('#dwn-btn');
+        let $downloadCompatibilityGraph = $('#dwn-btn-grph');
+        let $downloadLog = $('#dwn-btn-log');
 
-        $download.on('click', function () {
-
+        $downloadCompatibilityGraph.on('click', function () {
             if(serverSide){
                 let params = {"id": selectedHash};
                 $.ajax({
@@ -51,8 +53,23 @@ $(document).ready(function () {
             }
             else{
                 downloadUpdatedFile(objects[selectedHash].update);
-                //TODO: Agregar boton para descargar el log.
-                // download("log.txt", objects[selectedHash].getLog());
+            }
+        });
+
+        $downloadLog.on('click', function(){
+            if(serverSide){
+                let params = {"id": selectedHash};
+                $.ajax({
+                    url: '/log',
+                    type: 'GET',
+                    data: params,
+                    dataType: 'json',
+                    contentType: false,
+                    success: downloadLog
+                });
+            }
+            else{
+                downloadLog(objects[selectedHash].log);
             }
         });
 
@@ -670,6 +687,15 @@ $(document).ready(function () {
     function downloadUpdatedFile(compatibilityGraph) {
         let content = JSON.stringify(compatibilityGraph, null, 2);
         download(filename, content);
+    }
+
+    /**
+     * Calls a prompt that allows to download the log of the current object.
+     *
+     * @param {string} log -
+     */
+    function downloadLog(log){
+        download(logname, log);
     }
 
     /**
