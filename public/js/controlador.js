@@ -19,7 +19,6 @@ $(document).ready(function () {
         originalAltruists = [],
         currentAltruists = [],
         serverSide = false,
-        descendent = true,
         selectedHash = false,
         fileName = {},
         /**
@@ -94,7 +93,9 @@ $(document).ready(function () {
 
                                 if (evt.lengthComputable) {
                                     let percentComplete = evt.loaded / evt.total;
-                                    percentComplete = parseInt(percentComplete * 100);
+                                    percentComplete = parseInt(
+                                        percentComplete * 100
+                                    );
 
                                     $progress_bar.text(percentComplete + '%');
                                     $progress_bar.width(percentComplete + '%');
@@ -318,10 +319,16 @@ $(document).ready(function () {
 
                 do {
                     correcte = true;
-                    depth = window.prompt("Introdueix la profunditat per generar la cadena de trasplantament: ", "3");
+                    depth = window.prompt(
+                        "Introdueix la profunditat per generar la cadena de " +
+                        "trasplantament: ", "3"
+                    );
 
                     if (isNaN(depth)) {
-                        alert("Error: la profunditat ha de ser un número i ha de ser igual a 1 o superior");
+                        alert(
+                            "Error: la profunditat ha de ser un número i ha " +
+                            "de ser igual a 1 o superior"
+                        );
                         correcte = false;
                     }
                     else if (depth < 1) {
@@ -693,12 +700,12 @@ $(document).ready(function () {
      * Transplants that are confirmed.
      */
     function updatePanellTransplantsConfirmats(confirmats) {
-        var $llista = $('#transplants-confirmats tbody');
+        let $llista = $('#transplants-confirmats tbody');
 
         $llista.html('');
 
-        for (var i = 0; i < confirmats.length; i++) {
-            var $row = $('<tr>' +
+        for (let i = 0; i < confirmats.length; i++) {
+            let $row = $('<tr>' +
                 '<td>' + confirmats[i].donant + '</td>' +
                 '<td>' + confirmats[i].receptor + '</td>' +
                 '</tr>'
