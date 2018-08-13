@@ -413,7 +413,8 @@ $(document).ready(function () {
                 "donantsIgnorats": auxIgnoraDonants,
                 "receptorsIgnorats": auxIgnoraReceptors,
                 "provesEncreuades": resultatsProvaEncreuada,
-                "ignorarFallada": paramIgnoreFailureProbability
+                "ignorarFallada": paramIgnoreFailureProbability,
+                "longitudCadena": paramChainLength
             };
             $.LoadingOverlay("show");
             $.ajax({

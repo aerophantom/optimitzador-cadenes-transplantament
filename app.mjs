@@ -88,7 +88,8 @@ app.put('/cadena-trasplantaments', function (req, res){
         ignoredDonors: req.body.donantsIgnorats,
         ignoredRecipients: req.body.receptorsIgnorats,
         crossedTests: req.body.provesEncreuades,
-        ignoreFailureProbability: req.body.ignorarFallada
+        ignoreFailureProbability: req.body.ignorarFallada,
+        chainLength: req.body.longitudCadena
     };
 
     let result = objects[id].buildChain(depth, patient, kwargs);
