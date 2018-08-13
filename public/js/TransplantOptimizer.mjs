@@ -386,6 +386,8 @@ export default class TransplantOptimizer{
      * les parelles de la prova encreuada que han donat positiu.
      * @param {Array} [kwargs.ignoreFailureProbability=false] - indica si es
      * ignora la probabilitat de fallada.
+     * @param {number} [kwargs.chainLength=Infinity] - Longitud de la cadena que es
+     * vol generar.
      * @returns {Chain} - array de tuples amb les dades de trasplantament.
      * @public
      */
@@ -394,6 +396,7 @@ export default class TransplantOptimizer{
         let no_more_transplantations;
         let cadenaTransplants = [];
         let resultatsProvaEncreuada = kwargs.crossedTests || [];
+        let chainLength = kwargs.chainLength ||Infinity;
 
         this._IgnoredDonors = [];
         this._IgnoredRecipients = [];
@@ -455,7 +458,7 @@ export default class TransplantOptimizer{
                     delete this._Donors[dadesTransplant.donant];
                     this.eliminarReceptor(dadesTransplant.receptor);
                     current = trasplantament.receptor;
-                    no_more_transplantations = false;
+                    no_more_transplantations = cadenaTransplants.length >= chainLength;
                 }
                 break;
             }
