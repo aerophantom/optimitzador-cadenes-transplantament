@@ -425,12 +425,17 @@ export default class TransplantOptimizer{
             let T = TransplantOptimizer.obtenirConjuntOrdenatPerValor(S, val);
             no_more_transplantations = true;
 
-            //TODO refactoritzable for of a la espera de un nombre adecuado.
-            for (let i = 0; i < T.length; i++) {
-                let donant = current === altruist ? altruist : T[i].receptor.donant;
-                let receptor = T[i].receptor.receptor;
+            for (const trasplantament of T) {
+                let donant = trasplantament.receptor.donant;
+                if(current === altruist){
+                    donant = altruist;
+                }
+                let receptor = trasplantament.receptor.receptor;
 
-                if (TransplantOptimizer.provaEncreuada(resultatsProvaEncreuada, donant, receptor)) {
+                let positiveCrossedTest = TransplantOptimizer.provaEncreuada(
+                    resultatsProvaEncreuada, donant, receptor
+                );
+                if (positiveCrossedTest) {
                     // Si el resultat de la prova és positiu no es pot fer el
                     // trasplantament
                     this.eliminarDonantCompatibleDeReceptor(donant, receptor);
@@ -444,12 +449,12 @@ export default class TransplantOptimizer{
                         receptor: receptor,
                         donant: donant,
                         probExit: this.spDonant(donant, receptor),
-                        valor: T[i].valor
+                        valor: trasplantament.valor
                     };
                     cadenaTransplants.push(dadesTransplant);
                     delete this._Donors[dadesTransplant.donant];
                     this.eliminarReceptor(dadesTransplant.receptor);
-                    current = T[i].receptor;
+                    current = trasplantament.receptor;
                     no_more_transplantations = false;
                 }
                 break;
