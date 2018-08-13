@@ -17,10 +17,13 @@ $(document).ready(function () {
         resultatsProvaEncreuada = [],
         confirmats = [],
         previousDepth,
-        previousDonor,
+        previousDonor = false,
         chainsDataTable,
         originalAltruists = [],
         currentAltruists = [],
+        paramDepth = 3,
+        paramChainLength = 0,
+        paramIgnoreFailureProbability = false,
         serverSide = false,
         selectedHash = false,
         fileName = {},
@@ -167,14 +170,30 @@ $(document).ready(function () {
 
         $('.reset-btn').on('click', function () {
             resetLlista($(this).attr('data-llista'));
-            loadPatientChain(previousDonor, previousDepth);
+            loadPatientChain(previousDonor);
         });
 
-        $('#ignorar-prob-fallada').on('change', function () {
-            if (previousDepth && previousDonor) {
-                loadPatientChain(previousDonor, previousDepth);
+        // $('#ignorar-prob-fallada').on('change', function () {
+        //     if (previousDepth && previousDonor) {
+        //         loadPatientChain(previousDonor, previousDepth);
+        //     }
+        // });
+
+        $('#save-chng-params').on('click', function(){
+            paramChainLength = $('#inp-chain-length').val();
+            paramDepth = $('#inp-depth').val();
+            paramIgnoreFailureProbability = $('#ignorar-prob-fallada').prop('checked');
+            if(previousDonor){
+                loadPatientChain(previousDonor);
             }
         });
+
+        $('#cancel-chng-params').on('click', function(){
+            $('#inp-chain-length').val(paramChainLength);
+            $('#inp-depth').val(paramDepth);
+            $('#ignorar-prob-fallada').prop('checked', paramIgnoreFailureProbability);
+        });
+
 
         $(window).resize(function() {
             updateChainTableHeaders();
@@ -333,30 +352,7 @@ $(document).ready(function () {
             $tableBody.append($row);
             $row.on('click', function () {
                 let patientId = $(this).attr('data-id');
-                let depth;
-                let correcte;
-
-                do {
-                    correcte = true;
-                    depth = window.prompt(
-                        "Introdueix la profunditat per generar la cadena de " +
-                        "trasplantament: ", "3"
-                    );
-
-                    if (isNaN(depth)) {
-                        alert(
-                            "Error: la profunditat ha de ser un número i ha " +
-                            "de ser igual a 1 o superior"
-                        );
-                        correcte = false;
-                    }
-                    else if (depth < 1) {
-                        alert("Error: la profunditat mínima ha de ser 1");
-                        correcte = false;
-                    }
-                } while (!correcte);
-
-                loadPatientChain(patientId, depth);
+                loadPatientChain(patientId);
             });
         }
     }
@@ -371,8 +367,7 @@ $(document).ready(function () {
      * ignorats, la profunditat i els resultats de la prova encreuada,
      * incloent-hi els nous elements passats com argument.
      *
-     * @param {number} patientId - id del donant
-     * @param {number} depth - profunditat a explorar
+     * @param {string} patientId - id del donant
      * @param {object} [kwargs={}] - Paràmetres opcionals alhora de calcular la
      * cadena de trasplantaments.
      * @param {number} [kwargs.ignoraDonant] - id del nou donant a ignorar.
@@ -380,8 +375,7 @@ $(document).ready(function () {
      * @param {string} [kwargs.resultatProvaEncreuada] - parella per la què ha
      * donat positiva la prova encreuada.
      */
-    function loadPatientChain(patientId, depth, kwargs = {}) {
-        let ignorarFallada = $('#ignorar-prob-fallada').prop('checked');
+    function loadPatientChain(patientId, kwargs = {}) {
 
         if (kwargs.ignoraDonant) {
             ignoraDonants.push(kwargs.ignoraDonant);
@@ -396,7 +390,7 @@ $(document).ready(function () {
             updatePanellProvaEncreuada(resultatsProvaEncreuada);
         }
 
-        previousDepth = depth;
+        previousDepth = paramDepth;
         previousDonor = patientId;
 
         $.LoadingOverlay("show");
@@ -414,12 +408,12 @@ $(document).ready(function () {
         if (serverSide){
             let body = {
                 "id": selectedHash,
-                "profunditat": depth,
+                "profunditat": paramDepth,
                 "pacient": patientId,
                 "donantsIgnorats": auxIgnoraDonants,
                 "receptorsIgnorats": auxIgnoraReceptors,
                 "provesEncreuades": resultatsProvaEncreuada,
-                "ignorarFallada": ignorarFallada
+                "ignorarFallada": paramIgnoreFailureProbability
             };
             $.LoadingOverlay("show");
             $.ajax({
@@ -437,10 +431,11 @@ $(document).ready(function () {
                 ignoredDonors: auxIgnoraDonants,
                 ignoredRecipients: auxIgnoraReceptors,
                 crossedTests: resultatsProvaEncreuada,
-                ignoreFailureProbability: ignorarFallada
+                ignoreFailureProbability: paramIgnoreFailureProbability,
+                chainLength: paramChainLength
             };
             let cadena = objects[selectedHash].buildChain(
-                depth, patientId, optionalParameters
+                paramDepth, patientId, optionalParameters
             );
             updateChains(cadena);
             $.LoadingOverlay("hide", true);
@@ -461,6 +456,13 @@ $(document).ready(function () {
 
         $('#altruistNode').html(previousDonor);
         $('#depthNode').html(previousDepth);
+        $('#lengthNode').html(paramChainLength.toString());
+
+        let failureText = "no";
+        if(paramIgnoreFailureProbability){
+            failureText = "si";
+        }
+        $('#failureProbNode').html(failureText);
 
 
         for (let i = 0; i < dades.length; i++) {
@@ -482,14 +484,14 @@ $(document).ready(function () {
             $donantIcon.on('click', function () {
                 let donantId = $(this).attr('data-donant-id');
                 let kwargs = {ignoraDonant: donantId};
-                loadPatientChain(previousDonor, previousDepth, kwargs);
+                loadPatientChain(previousDonor, kwargs);
             });
 
             let $receptorIcon = $row.find('[data-receptor-id]');
             $receptorIcon.on('click', function () {
                 let receptorId = $(this).attr('data-receptor-id');
                 let kwargs = {ignoraReceptor: receptorId};
-                loadPatientChain(previousDonor, previousDepth, kwargs);
+                loadPatientChain(previousDonor, kwargs);
             });
 
             let $provaEncreuadaIcon = $row.find('[data-prova-encreuada-id]');
@@ -497,7 +499,7 @@ $(document).ready(function () {
             $provaEncreuadaIcon.on('click', function () {
                 let provaEncreuadaId = $(this).attr('data-prova-encreuada-id');
                 let kwargs = {resultatProvaEncreuada: provaEncreuadaId};
-                loadPatientChain(previousDonor, previousDepth, kwargs);
+                loadPatientChain(previousDonor, kwargs);
             });
 
             let $confirmarIcon = $row.find('[data-confirmar-index]');
@@ -543,7 +545,7 @@ $(document).ready(function () {
                 let index = dades.indexOf(parell);
                 dades.splice(index, 1);
                 updatePanellProvaEncreuada(dades);
-                loadPatientChain(previousDonor, previousDepth);
+                loadPatientChain(previousDonor);
             });
         }
     }
@@ -574,7 +576,7 @@ $(document).ready(function () {
                 let index = dades.indexOf(parell);
                 dades.splice(index, 1);
                 updatePanellReceptorsIgnorats(dades);
-                loadPatientChain(previousDonor, previousDepth);
+                loadPatientChain(previousDonor);
             });
         }
     }
@@ -603,7 +605,7 @@ $(document).ready(function () {
                 let index = dades.indexOf(parell);
                 dades.splice(index, 1);
                 updatePanellDonantsIgnorats(dades);
-                loadPatientChain(previousDonor, previousDepth);
+                loadPatientChain(previousDonor);
             });
         }
     }
