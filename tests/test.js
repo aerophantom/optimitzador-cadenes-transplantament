@@ -340,6 +340,20 @@ test('build chain', t => {
     t.is(chain[4].donant, "3003");
 });
 
+test('build chain with max length', t => {
+    let to = new TransplantOptimizer(file);
+    let kwargs = {chainLength: 3};
+    let chain = to.buildChain(3, "1000", kwargs);
+
+    t.is(chain.length, 3);
+    t.is(chain[0].receptor, "2000");
+    t.is(chain[0].donant, "1000");
+    t.is(chain[1].receptor, "2004");
+    t.is(chain[1].donant, "3000");
+    t.is(chain[2].receptor, "2003");
+    t.is(chain[2].donant, "3007");
+});
+
 test('build chain ignoring recipient', t => {
     let to = new TransplantOptimizer(file);
     let kwargs = {ignoredRecipients: ["2003"]};
@@ -371,7 +385,6 @@ test('build chain ignoring donor', t => {
     t.is(chain[4].receptor, "2004");
     t.is(chain[4].donant, "3002");
 });
-
 
 test('build chain ignoring the altruist donor', t => {
     let to = new TransplantOptimizer(file);
