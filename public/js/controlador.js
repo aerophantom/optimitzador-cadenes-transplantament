@@ -419,7 +419,7 @@ $(document).ready(function () {
             $.LoadingOverlay("show");
             $.ajax({
                 url: '/cadena-trasplantaments',
-                type: 'PUT',
+                type: 'PATCH',
                 data: JSON.stringify(body),
                 dataType: 'json',
                 processData: false,

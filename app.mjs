@@ -78,7 +78,7 @@ app.post('/cadena-trasplantaments', function (req, res){
     });
 });
 
-app.put('/cadena-trasplantaments', function (req, res){
+app.patch('/cadena-trasplantaments', function (req, res){
     // aquesta crida ens demana que calculem la cadena optima
     let id = req.body.id;
     let depth = req.body.profunditat;
