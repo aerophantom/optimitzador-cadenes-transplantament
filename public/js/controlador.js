@@ -4,7 +4,7 @@ import Utils from "./Utils.mjs";
 $(document).ready(function () {
 
     /**
-     * Llista d'objectes que conté la informació que constitueix una cadena.
+     * List of objects that determines a chain.
      * @typedef {Array.<{receptor: string, donant: string, probExit: number, valor: number}>} Chain
      * @
      */

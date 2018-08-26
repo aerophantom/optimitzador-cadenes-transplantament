@@ -1,24 +1,23 @@
 import Utils from './Utils.mjs';
 
 /**
- * Classe que representa un optimitzador de trasplantaments.
+ * Class that represents a trasplant optimizer.
  */
 export default class TransplantOptimizer{
 
     /**
-     * Llistes que contenen els identificadors (donants o receptors)
+     * Lists that contains identifiers (from donors or recipients)
      * @typedef {Array.<string>} Identifiers
      */
 
     /**
-     * Llista d'objectes que conté la informació que constitueix una cadena.
+     * List of objects that determines a chain
      * @typedef {Array.<{receptor: string, donant: string, probExit: number, valor: number}>} Chain
-     * @
      */
 
     /**
-     *
-     * @param _compatibilityGraph
+     * Class constructor.
+     * @param {Object} _compatibilityGraph
      */
     constructor(_compatibilityGraph){
         this._CompatibilityGraph = _compatibilityGraph;
