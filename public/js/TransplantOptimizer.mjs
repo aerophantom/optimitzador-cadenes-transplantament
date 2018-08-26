@@ -468,7 +468,7 @@ export default class TransplantOptimizer{
         timeDiff /= 1000;
         this._secondsElapsed = Math.round(timeDiff);
         this._Log.candidates = cadenaTransplants;
-        console.log(cadenaTransplants);
+        console.log(JSON.stringify(cadenaTransplants, null, 2));
         return cadenaTransplants;
     }
 
@@ -668,7 +668,7 @@ export default class TransplantOptimizer{
                 compatible_donors.splice(compatible_donor_to_remove, 1);
             }
         }
-        console.log(obj);
+        console.log(JSON.stringify(obj, null, 2));
         return obj;
     }
 }
