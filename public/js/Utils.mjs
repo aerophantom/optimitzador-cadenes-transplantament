@@ -44,6 +44,7 @@ export default class Utils{
      * @param {object} compatibilityGraph
      */
     static toAppFormat(compatibilityGraph){
+        console.log(JSON.stringify(compatibilityGraph, null, 2));
         compatibilityGraph.altruists = compatibilityGraph.altruists.map(String);
         let patients = compatibilityGraph.patients;
 

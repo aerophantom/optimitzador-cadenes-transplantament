@@ -20,6 +20,7 @@ export default class TransplantOptimizer{
      * @param {Object} _compatibilityGraph
      */
     constructor(_compatibilityGraph){
+        console.log(JSON.stringify(_compatibilityGraph, null, 2));
         this._CompatibilityGraph = _compatibilityGraph;
         this._Recipients = null;
         this._Donors = null;
