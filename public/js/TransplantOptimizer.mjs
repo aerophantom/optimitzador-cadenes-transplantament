@@ -28,6 +28,7 @@ export default class TransplantOptimizer{
         this._IgnoredRecipients = [];
         this._IgnoreFailureProbability = false;
         this._HashCodeComputed = false;
+        this._ChainLength = 3;
         this._Log = {
             "candidates": [],
             "crossed_tests": [],
@@ -395,7 +396,7 @@ export default class TransplantOptimizer{
         let no_more_transplantations;
         let cadenaTransplants = [];
         let resultatsProvaEncreuada = kwargs.crossedTests || [];
-        let chainLength = kwargs.chainLength ||Infinity;
+        this._ChainLength = kwargs.chainLength || Infinity;
 
         this._IgnoredDonors = [];
         this._IgnoredRecipients = [];
@@ -457,7 +458,7 @@ export default class TransplantOptimizer{
                     delete this._Donors[dadesTransplant.donant];
                     this.eliminarReceptor(dadesTransplant.receptor);
                     current = trasplantament.receptor;
-                    no_more_transplantations = cadenaTransplants.length >= chainLength;
+                    no_more_transplantations = cadenaTransplants.length >= this._ChainLength;
                 }
                 break;
             }
