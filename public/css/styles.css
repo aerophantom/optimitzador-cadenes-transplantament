@@ -27,7 +27,9 @@ body {
     background-color: #F89406;
     border: none;
 }
-
+.btn{
+    margin-top: 20px;
+}
 .reset-btn {
     margin-top: 15px;
 }

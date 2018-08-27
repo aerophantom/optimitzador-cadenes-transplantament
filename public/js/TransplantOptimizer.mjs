@@ -28,6 +28,8 @@ export default class TransplantOptimizer{
         this._IgnoredRecipients = [];
         this._IgnoreFailureProbability = false;
         this._HashCodeComputed = false;
+        this._ChainLength = Infinity;
+        this._Depth = 3;
         this._Log = {
             "candidates": [],
             "crossed_tests": [],
@@ -395,8 +397,9 @@ export default class TransplantOptimizer{
         let no_more_transplantations;
         let cadenaTransplants = [];
         let resultatsProvaEncreuada = kwargs.crossedTests || [];
-        let chainLength = kwargs.chainLength ||Infinity;
 
+        this._ChainLength = kwargs.chainLength || Infinity;
+        this._Depth = depth;
         this._IgnoredDonors = [];
         this._IgnoredRecipients = [];
         this._IgnoreFailureProbability = kwargs.ignoreFailureProbability || false;
@@ -457,7 +460,7 @@ export default class TransplantOptimizer{
                     delete this._Donors[dadesTransplant.donant];
                     this.eliminarReceptor(dadesTransplant.receptor);
                     current = trasplantament.receptor;
-                    no_more_transplantations = cadenaTransplants.length >= chainLength;
+                    no_more_transplantations = cadenaTransplants.length >= this._ChainLength;
                 }
                 break;
             }
@@ -568,6 +571,29 @@ export default class TransplantOptimizer{
     }
 
     /**
+     * Obtains the json string of *this.
+     *
+     * @returns {string} - *this serialized
+     */
+    get serialize(){
+        let log = {
+            data: Utils.currentDateTime,
+            hash_original: this.hashCode,
+            trasplantaments: this._Log.candidates,
+            parametritzacio: {
+                ignorar_fallada: this._IgnoreFailureProbability,
+                max_llargada: this._ChainLength,
+                profunditat: this._Depth,
+                donants_ignorats: this._IgnoredDonors,
+                receptors_ignorats: this._IgnoredRecipients,
+                positius_proves_creuades: this._Log.crossed_tests
+            },
+            temps_emprat: this._secondsElapsed
+        }
+        return JSON.stringify(log, null, 2);
+    }
+
+    /**
      * Obtains the log as the result of calculating the transplant's chain.
      *
      * @returns {string}
@@ -592,13 +618,19 @@ export default class TransplantOptimizer{
         logAsText += ">>IGNORAR PROBABILITAT FALLADA: {}\n".format(
             ignoraProabilitat
         );
+        logAsText += ">>LLARGADA DE LA CADENA: {}\n".format(
+            this._ChainLength.toString()
+        )
+        logAsText += ">>PROFUNDITAT: {}\n".format(
+            this._Depth.toString()
+        );
         logAsText += ">>DONANTS IGNORATS\n";
         for(const ignoredDonor of this._IgnoredDonors){
-            logAsText += ignoredDonor;
+            logAsText += "{}\n".format(ignoredDonor);
         }
         logAsText += ">>RECEPTORS IGNORATS\n";
         for(const ignoredRecipient of this._IgnoredRecipients){
-            logAsText += ignoredRecipient;
+            logAsText += "{}\n".format(ignoredRecipient);
         }
 
         logAsText += ">>POSITIUS PROVES CREUADES\n";
