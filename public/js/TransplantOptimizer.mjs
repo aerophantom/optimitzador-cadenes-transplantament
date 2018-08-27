@@ -570,6 +570,29 @@ export default class TransplantOptimizer{
     }
 
     /**
+     * Obtains the json string of *this.
+     *
+     * @returns {string} - *this serialized
+     */
+    get serialize(){
+        let log = {
+            data: Utils.currentDateTime,
+            hash_original: this.hashCode,
+            trasplantaments: this._Log.candidates,
+            parametritzacio: {
+                ignorar_fallada: this._IgnoreFailureProbability,
+                max_llargada: this._ChainLength,
+                profunditat: this._Depth,
+                donants_ignorats: this._IgnoredDonors,
+                receptors_ignorats: this._IgnoredRecipients,
+                positius_proves_creuades: this._Log.crossed_tests
+            },
+            temps_emprat: this._secondsElapsed
+        }
+        return JSON.stringify(log, null, 2);
+    }
+
+    /**
      * Obtains the log as the result of calculating the transplant's chain.
      *
      * @returns {string}
