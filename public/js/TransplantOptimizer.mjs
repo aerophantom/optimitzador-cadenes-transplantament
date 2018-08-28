@@ -599,7 +599,7 @@ export default class TransplantOptimizer{
      */
     get log(){
         let logAsText =  ">LOG: {}\n".format(Utils.currentDateTime);
-        logAsText += "HASH FITXER ORIGINAL: {}\n".format(this.hashCode);
+        logAsText += ">HASH FITXER ORIGINAL: {}\n".format(this.hashCode);
         logAsText += ">TRASPLANTAMENTS:\n";
         logAsText += "DONANT;RECEPTOR;PROBABILITAT_EXIT;VALOR\n";
 
