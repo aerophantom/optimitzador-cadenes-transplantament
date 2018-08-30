@@ -18,7 +18,7 @@ let __dirname = path.dirname(new URL(import.meta.url).pathname);
 // if path has whitespeaces, then path.dirname will replace them with "%20"
 // the next function replaces the "%20" with whitespaces
 __dirname = __dirname.replace(/%20/g, " ");
-
++__dirname = __dirname.replace("/", "");
 /**
  * For each file loaded, there will be a TrasplantOptimizer object.
  * @type {{string: TransplantOptimizer}}
