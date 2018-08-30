@@ -131,13 +131,13 @@ $(document).ready(function () {
                     });
                 }
                 else{
+                    objects = {};
                     let filesData = {};
                     for (let i = 0; i < files.length; i++) {
                         let f = files[i];
                         let fr = new FileReader();
                         fr.onload = (function(file){
                             let nomFitxer = file.name;
-                            // imperativo entender como leches funciona esto
                             // https://stackoverflow.com/questions/16937223/pass-a-parameter-to-filereader-onload-event
                             return function(e){
                                 let compatibilityGraph = JSON.parse(
@@ -319,6 +319,7 @@ $(document).ready(function () {
         let $tableBody = $('#filesTable').find('tbody');
         $tableBody.html('');
 
+        selectedHash = false;
         for (const hash in filesData){
             let fileName = filesData[hash];
             let $row = $("<tr data-id='" + hash + "'><td>" + fileName + "</td><td>" + hash + "</td></tr>");
