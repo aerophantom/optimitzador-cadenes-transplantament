@@ -251,6 +251,16 @@ $(document).ready(function () {
     }
 
     /**
+     * Empty the lists of the third view.
+     */
+    function resetThirdViewLists() {
+        resetLlista('confirmats');
+        resetLlista('proves');
+        resetLlista('receptors');
+        resetLlista('donants');
+    }
+
+    /**
      * Actualitza el resum de les dades carregades amb la informació passada
      * com argument.
      *
@@ -327,6 +337,7 @@ $(document).ready(function () {
                 else{
                     updateSummary(objects[selectedHash].summary);
                 }
+                resetThirdViewLists();
             });
             if(!selectedHash){
                 selectedHash = hash;
