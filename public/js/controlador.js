@@ -173,14 +173,8 @@ $(document).ready(function () {
             loadPatientChain(previousDonor);
         });
 
-        // $('#ignorar-prob-fallada').on('change', function () {
-        //     if (previousDepth && previousDonor) {
-        //         loadPatientChain(previousDonor, previousDepth);
-        //     }
-        // });
-
         $('#save-chng-params').on('click', function(){
-            paramChainLength = $('#inp-chain-length').val();
+            paramChainLength = parseInt($('#inp-chain-length').val());
             paramDepth = $('#inp-depth').val();
             paramIgnoreFailureProbability = $('#ignorar-prob-fallada').prop('checked');
             if(previousDonor){
