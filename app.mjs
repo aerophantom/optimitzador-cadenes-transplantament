@@ -60,6 +60,7 @@ app.post('/cadena-trasplantaments', function (req, res){
     });
 
     form.parse(req, function(err, fields, files){
+        objects = {};
         let response = {};
         if (Array.isArray(files["uploads[]"])){
             // Si es una llista llavors ha penjat multiples fitxers

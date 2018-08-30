@@ -131,13 +131,13 @@ $(document).ready(function () {
                     });
                 }
                 else{
+                    objects = {};
                     let filesData = {};
                     for (let i = 0; i < files.length; i++) {
                         let f = files[i];
                         let fr = new FileReader();
                         fr.onload = (function(file){
                             let nomFitxer = file.name;
-                            // imperativo entender como leches funciona esto
                             // https://stackoverflow.com/questions/16937223/pass-a-parameter-to-filereader-onload-event
                             return function(e){
                                 let compatibilityGraph = JSON.parse(
@@ -173,14 +173,8 @@ $(document).ready(function () {
             loadPatientChain(previousDonor);
         });
 
-        // $('#ignorar-prob-fallada').on('change', function () {
-        //     if (previousDepth && previousDonor) {
-        //         loadPatientChain(previousDonor, previousDepth);
-        //     }
-        // });
-
         $('#save-chng-params').on('click', function(){
-            paramChainLength = $('#inp-chain-length').val();
+            paramChainLength = parseInt($('#inp-chain-length').val());
             paramDepth = $('#inp-depth').val();
             paramIgnoreFailureProbability = $('#ignorar-prob-fallada').prop('checked');
             if(previousDonor){
@@ -251,6 +245,16 @@ $(document).ready(function () {
     }
 
     /**
+     * Empty the lists of the third view.
+     */
+    function resetThirdViewLists() {
+        resetLlista('confirmats');
+        resetLlista('proves');
+        resetLlista('receptors');
+        resetLlista('donants');
+    }
+
+    /**
      * Actualitza el resum de les dades carregades amb la informació passada
      * com argument.
      *
@@ -315,6 +319,7 @@ $(document).ready(function () {
         let $tableBody = $('#filesTable').find('tbody');
         $tableBody.html('');
 
+        selectedHash = false;
         for (const hash in filesData){
             let fileName = filesData[hash];
             let $row = $("<tr data-id='" + hash + "'><td>" + fileName + "</td><td>" + hash + "</td></tr>");
@@ -327,6 +332,7 @@ $(document).ready(function () {
                 else{
                     updateSummary(objects[selectedHash].summary);
                 }
+                resetThirdViewLists();
             });
             if(!selectedHash){
                 selectedHash = hash;
