@@ -60,22 +60,26 @@ app.post('/cadena-trasplantaments', function (req, res){
     });
 
     form.parse(req, function(err, fields, files){
-        objects = {};
         let response = {};
-        if (Array.isArray(files["uploads[]"])){
-            // Si es una llista llavors ha penjat multiples fitxers
-            for(const f of files["uploads[]"]){
-                let hash = parseDataFile(f.path);
-                response[hash.toString()] = f.name;
+        try{
+            if (Array.isArray(files["uploads[]"])){
+                // Si es una llista llavors ha penjat multiples fitxers
+                for(const f of files["uploads[]"]){
+                    let hash = parseDataFile(f.path);
+                    response[hash.toString()] = f.name;
+                }
             }
+            else{
+                // nomes ha penjat un fitxer
+                let hash = parseDataFile(files["uploads[]"].path);
+                response[hash.toString()] = files["uploads[]"].name;
+            }
+            res.type('json');
+            res.end(JSON.stringify(response));
         }
-        else{
-            // nomes ha penjat un fitxer
-            let hash = parseDataFile(files["uploads[]"].path);
-            response[hash.toString()] = files["uploads[]"].name;
+        catch (e) {
+            res.status(500).send('Hi ha algun fitxer no compatible. La càrrega de fitxers no es farà.');
         }
-        res.type('json');
-        res.end(JSON.stringify(response));
     });
 });
 
@@ -131,19 +135,15 @@ app.get('/log', function (req, res){
  * memòria i seguidament l'esborra.
  *
  * @param {string} ruta - ruta del fitxer que es vol analitzar
- * @returns {boolean} - cert si s'ha parsejat amb èxit
+ * @returns {number} - cert si s'ha parsejat amb èxit
  */
 function parseDataFile(ruta) {
     let id;
-    try {
-        let compatibilityGraph = JSON.parse(fs.readFileSync(ruta, 'utf8'));
-        Utils.toAppFormat(compatibilityGraph);
-        let object = new TransplantOptimizer(compatibilityGraph);
-        id = object.hashCode;
-        objects[id] = object;
-    } catch (e) {
-        console.error(e);
-    }
+    let compatibilityGraph = JSON.parse(fs.readFileSync(ruta, 'utf8'));
+    Utils.toAppFormat(compatibilityGraph);
+    let object = new TransplantOptimizer(compatibilityGraph);
+    id = object.hashCode;
+    objects[id] = object;
 
     fs.unlink(ruta, function () {/* buida per evitar el warning */
     });

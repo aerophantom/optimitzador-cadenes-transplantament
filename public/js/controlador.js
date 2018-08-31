@@ -106,6 +106,7 @@ $(document).ready(function () {
                         processData: false,
                         contentType: false,
                         success: updateIdentifiers,
+                        error: showAlertFromServer,
                         xhr: function () {
                             let xhr = new XMLHttpRequest();
 
@@ -140,25 +141,30 @@ $(document).ready(function () {
                             let nomFitxer = file.name;
                             // https://stackoverflow.com/questions/16937223/pass-a-parameter-to-filereader-onload-event
                             return function(e){
-                                let compatibilityGraph = JSON.parse(
-                                    e.target.result
-                                );
-                                Utils.toAppFormat(compatibilityGraph);
-                                let object = new TransplantOptimizer(
-                                    compatibilityGraph
-                                );
-                                let hash = object.hashCode;
-                                objects[hash] = object;
-                                filesData[hash.toString()] = nomFitxer;
-                                if(!selectedHash){
-                                    // The default selected file is the first
-                                    // on to be loaded
-                                    selectedHash = hash;
+                                try{
+                                    let compatibilityGraph = JSON.parse(
+                                        e.target.result
+                                    );
+                                    Utils.toAppFormat(compatibilityGraph);
+                                    let object = new TransplantOptimizer(
+                                        compatibilityGraph
+                                    );
+                                    let hash = object.hashCode;
+                                    objects[hash] = object;
+                                    filesData[hash.toString()] = nomFitxer;
+                                    if(!selectedHash){
+                                        // The default selected file is the first
+                                        // on to be loaded
+                                        selectedHash = hash;
+                                    }
+                                    if(i === files.length - 1){
+                                        fileName = filesData;
+                                        updateFilesTable(filesData);
+                                        updateSummary(objects[selectedHash].summary);
+                                    }
                                 }
-                                if(i === files.length - 1){
-                                    fileName = filesData;
-                                    updateFilesTable(filesData);
-                                    updateSummary(objects[selectedHash].summary);
+                                catch (e) {
+                                    alert("Hi ha algun fitxer no compatible. La càrrega de fitxers no es farà.");
                                 }
                             };
                         })(f);
@@ -212,6 +218,17 @@ $(document).ready(function () {
             $headers.get(1).innerHTML = "Donant";
             $headers.get(2).innerHTML = "Receptor";
         }
+    }
+
+    /**
+     * Alerts the user if the uploaded file is not JSON serializable.
+     *
+     * @param jqXHR
+     * @param textStatus
+     * @param errorThrown
+     */
+    function showAlertFromServer(jqXHR, textStatus, errorThrown){
+        alert(jqXHR.responseText)
     }
 
     /**
