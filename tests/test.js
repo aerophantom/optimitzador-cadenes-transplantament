@@ -593,6 +593,79 @@ test('get updated file ignoring a recipient and a donor', t => {
     t.deepEqual(to.update, expected);
 });
 
+test('get empty log', t => {
+    let expected =
+        ">HASH FITXER ORIGINAL\n" +
+        "555988960\n" +
+        ">TRASPLANTAMENTS:\n" +
+        "DONANT;RECEPTOR;PROBABILITAT_EXIT;VALOR\n" +
+        ">PARAMETRITZACIÓ\n" +
+        ">>IGNORAR PROBABILITAT FALLADA\n" +
+        "fals\n" +
+        ">>LLARGADA DE LA CADENA\n" +
+        "Infinity\n" +
+        ">>PROFUNDITAT\n" +
+        "3\n" +
+        ">>DONANTS IGNORATS\n" +
+        ">>RECEPTORS IGNORATS\n" +
+        ">>POSITIUS PROVES CREUADES\n" +
+        "RECEPTOR;DONANT\n" +
+        ">Time elapsed\n" +
+        "time;magnitude\n";
+    let to = new TransplantOptimizer(file);
+    let log = to.log;
+    let logLines = log.split('\n');
+    logLines.splice(0, 2);                      // delete the two first lines
+    logLines.splice(logLines.length - 2, 2);    // delete the two last ones
+    let newLog = "";
+    for(let line of logLines){
+        newLog += "{}\n".format(line)
+    }
+    t.is(newLog, expected);
+});
+
+test('get full log', t => {
+    let expected =
+        ">HASH FITXER ORIGINAL\n" +
+        "555988960\n" +
+        ">TRASPLANTAMENTS:\n" +
+        "DONANT;RECEPTOR;PROBABILITAT_EXIT;VALOR\n" +
+        "1000;2000;1;97.9\n" +
+        ">PARAMETRITZACIÓ\n" +
+        ">>IGNORAR PROBABILITAT FALLADA\n" +
+        "cert\n" +
+        ">>LLARGADA DE LA CADENA\n" +
+        "Infinity\n" +
+        ">>PROFUNDITAT\n" +
+        "3\n" +
+        ">>DONANTS IGNORATS\n" +
+        "3000\n" +
+        ">>RECEPTORS IGNORATS\n" +
+        "2003\n" +
+        ">>POSITIUS PROVES CREUADES\n" +
+        "RECEPTOR;DONANT\n" +
+        "2004;3002\n" +
+        ">Time elapsed\n" +
+        "time;magnitude\n";
+    let to = new TransplantOptimizer(file);
+    let kwargs = {
+        ignoredRecipients: ["2003"],
+        ignoredDonors: ["3000"],
+        ignoreFailureProbability: true,
+        crossedTests: ["2004-3002"]
+    };
+    to.buildChain(3, "1000", kwargs);
+    let log = to.log;
+    let logLines = log.split('\n');
+    logLines.splice(0, 2);                      // delete the two first lines
+    logLines.splice(logLines.length - 2, 2);    // delete the two last ones
+    let newLog = "";
+    for(let line of logLines){
+        newLog += "{}\n".format(line)
+    }
+    t.is(newLog, expected);
+});
+
 test('positive crossed test', t => {
     t.true(TransplantOptimizer.provaEncreuada(["2002-3001"], "3001", "2002"));
 });
