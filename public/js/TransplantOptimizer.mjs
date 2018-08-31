@@ -598,8 +598,8 @@ export default class TransplantOptimizer{
      * @returns {string}
      */
     get log(){
-        let logAsText =  ">LOG: {}\n".format(Utils.currentDateTime);
-        logAsText += ">HASH FITXER ORIGINAL: {}\n".format(this.hashCode);
+        let logAsText =  ">DATE\n{}\n".format(Utils.currentDateTime);
+        logAsText += ">HASH FITXER ORIGINAL\n{}\n".format(this.hashCode);
         logAsText += ">TRASPLANTAMENTS:\n";
         logAsText += "DONANT;RECEPTOR;PROBABILITAT_EXIT;VALOR\n";
 
@@ -614,13 +614,13 @@ export default class TransplantOptimizer{
         if(this._IgnoreFailureProbability){
             ignoraProabilitat = "cert";
         }
-        logAsText += ">>IGNORAR PROBABILITAT FALLADA: {}\n".format(
+        logAsText += ">>IGNORAR PROBABILITAT FALLADA\n{}\n".format(
             ignoraProabilitat
         );
-        logAsText += ">>LLARGADA DE LA CADENA: {}\n".format(
+        logAsText += ">>LLARGADA DE LA CADENA\n{}\n".format(
             this._ChainLength.toString()
         )
-        logAsText += ">>PROFUNDITAT: {}\n".format(
+        logAsText += ">>PROFUNDITAT\n{}\n".format(
             this._Depth.toString()
         );
         logAsText += ">>DONANTS IGNORATS\n";
@@ -637,7 +637,7 @@ export default class TransplantOptimizer{
         for(const positive of this._Log.crossed_tests){
             logAsText += "{};{}\n".format(positive.donor, positive.receiver);
         }
-        logAsText += "\nTime elapsed: {} s".format(this._secondsElapsed);
+        logAsText += ">Time elapsed\ntime;magnitude\n{};s\n".format(this._secondsElapsed);
         return logAsText;
     }
 
