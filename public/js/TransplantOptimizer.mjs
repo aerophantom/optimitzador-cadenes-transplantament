@@ -403,6 +403,7 @@ export default class TransplantOptimizer{
         this._IgnoredDonors = [];
         this._IgnoredRecipients = [];
         this._IgnoreFailureProbability = kwargs.ignoreFailureProbability || false;
+        this._Log.crossed_tests = kwargs.crossedTests || false;
 
         this.inicialitzarReceptors(kwargs);
         this.inicialitzarDonants(kwargs);
@@ -425,7 +426,6 @@ export default class TransplantOptimizer{
                 );
             }
 
-            this._Log.crossed_tests = [];
             // Llista d'elements de S ordenats incrementalment pel seu val.
             let T = TransplantOptimizer.obtenirConjuntOrdenatPerValor(S, val);
             no_more_transplantations = true;
@@ -444,9 +444,6 @@ export default class TransplantOptimizer{
                     // Si el resultat de la prova és positiu no es pot fer el
                     // trasplantament
                     this.eliminarDonantCompatibleDeReceptor(donant, receptor);
-                    this._Log.crossed_tests.push(
-                        {"donor": donant, "receiver": receptor}
-                    );
                     continue;
 
                 } else {
@@ -633,9 +630,9 @@ export default class TransplantOptimizer{
         }
 
         logAsText += ">>POSITIUS PROVES CREUADES\n";
-        logAsText += "DONANT;RECEPTOR\n";
-        for(const positive of this._Log.crossed_tests){
-            logAsText += "{};{}\n".format(positive.donor, positive.receiver);
+        logAsText += "RECEPTOR;DONANT\n";
+        for(let positive of this._Log.crossed_tests){
+            logAsText += "{}\n".format(positive.replace("-",";"));
         }
         logAsText += ">Time elapsed\ntime;magnitude\n{};s\n".format(this._secondsElapsed);
         return logAsText;
