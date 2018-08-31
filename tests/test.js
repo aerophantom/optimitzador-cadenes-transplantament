@@ -135,6 +135,13 @@ let file = {
     }
 };
 
+test('format string', t => {
+    t.is(
+        "Lorem {} dolor sit {}, consectetur adipiscing {}".format("ipsum", "amet", "elit"),
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    )
+})
+
 test('initialize recipients', t => {
     let to = new TransplantOptimizer(file);
     to.inicialitzarReceptors();
@@ -273,6 +280,19 @@ test('get score', t => {
     let score = to.scoreMultipleDonors({donant: "3000", receptor: "2002"});
     t.is(score, 59.59);
 });
+
+test('get summary', t => {
+    let expected = {
+        "origin": "TESTS",
+        "description": "Fitxer arcs5.json. Arc de prova amb només 5 receptors i les dades mínimes per provar la aplicació. Els id dels donants altruistes es correspoan amb el codi 1xxx, els receptors amb el codi 2xxx i els donants associats amb el codi 3xxx",
+        "altruists": [
+            "1000",
+            "1001"
+        ]
+    }
+    let to = new TransplantOptimizer(file);
+    t.deepEqual(to.summary, expected);
+})
 
 test('get updated file', t => {
     let expected = JSON.parse(JSON.stringify(file));
