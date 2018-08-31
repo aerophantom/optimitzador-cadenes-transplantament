@@ -692,7 +692,9 @@ export default class TransplantOptimizer{
                 if(llistatDonantsIgnoratsExtended.includes(compatible_donor.donor)){
                     compatible_donors_to_remove.push(index);
                 }
-                index += 1;
+                else{
+                    index += 1;
+                }
             }
             for(const compatible_donor_to_remove of compatible_donors_to_remove){
                 compatible_donors.splice(compatible_donor_to_remove, 1);
