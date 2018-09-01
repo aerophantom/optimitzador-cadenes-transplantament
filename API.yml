@@ -1,0 +1,395 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: "trasplantaments"
+  description: API que determina la comunicació entre el servidor i el client quan l'aplicació s'executa al servidor.
+  license:
+    name: MIT
+    url: https://github.com/aerophantom/optimitzador-cadenes-transplantament
+host: localhost:80
+basePath: /
+schemes:
+- http
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /log/{id}:
+    x-summary: Col·lecció de logs.
+    get:
+      description: Fitxer de text pla que conté la informació del càlcul de la cadena.
+      summary: Obté el contingut del log.
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Identificador de del fitxer. És el mateix que el hash del objecte que representa.
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            type: string
+              
+  /fitxer/{id}:
+    x-summary: Col·lecció de fitxers.
+    get:
+      description: Fitxer JSON que representa el graf de compatibilitat.
+      summary: Obté el contingut del fitxer actualitzat.
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Identificador de del fitxer. És el mateix que el hash del objecte que representa.
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Fitxer'
+          examples:
+            application/json:
+              {
+                "origin": "TESTS",
+                "description": "Fitxer arcs5.json. Arc de prova amb només 5 receptors i les dades mínimes per provar la aplicació. Els id dels donants altruistes es correspoan amb el codi 1xxx, els receptors amb el codi 2xxx i els donants associats amb el codi 3xxx",
+                "altruists": [
+                  "1000", 
+                  "1001"
+                ],
+                "patients": {
+                  "2000": {
+                    "related_donors": [
+                      "3000", 
+                      "3001"
+                    ],
+                    "compatible_donors": [
+                      {
+                        "failure_prob": 0.2,
+                        "score": 58.95,
+                        "donor": "1000"
+                      },
+                      {
+                        "failure_prob": 0.2,
+                        "score": 38.95,
+                        "donor": "3001"
+                      },
+                      {
+                        "failure_prob": 0.1,
+                        "score": 93.25,
+                        "donor": "3002"
+                      },
+                      {
+                        "failure_prob": 0.15,
+                        "score": 60.50,
+                        "donor": "3003"
+                      }
+                    ]
+                  },
+                  "2001": {
+                    "related_donors": [
+                      "3002"
+                    ],
+                    "compatible_donors": [
+                      {
+                        "failure_prob": 0.2,
+                        "score": 89.55,
+                        "donor": "3000"
+                      },
+                      {
+                        "failure_prob": 0.1,
+                        "score": 54.88,
+                        "donor": "3003"
+                      }
+                    ]
+                  },
+                  "2002": {
+                    "related_donors": [
+                      "3003", 
+                      "3004", 
+                      "3005"
+                    ],
+                    "compatible_donors": [
+                      {
+                        "failure_prob": 0.2,
+                        "score": 33.54,
+                        "donor": "1001"
+                      },
+                      {
+                        "failure_prob": 0.2,
+                        "score": 59.59,
+                        "donor": "3000"
+                      },
+                      {
+                        "failure_prob": 0.5,
+                        "score": 24.32,
+                        "donor": "3004"
+                      },
+                      {
+                        "failure_prob": 0.1,
+                        "score": 76.30,
+                        "donor": "3006"
+                      }
+                    ]
+                  },
+                  "2003": {
+                    "related_donors": [
+                      "3006"
+                    ],
+                    "compatible_donors": [
+                      {
+                        "failure_prob": 0.5,
+                        "score": 24.29,
+                        "donor": "3001"
+                      },
+                      {
+                        "failure_prob": 0.2,
+                        "score": 44.55,
+                        "donor": "3007"
+                      },
+                      {
+                        "failure_prob": 0.5,
+                        "score": 24.29,
+                        "donor": "3008"
+                      }
+                    ]
+                  },
+                  "2004": {
+                    "related_donors": [
+                      "3007", 
+                      "3008"
+                    ],
+                    "compatible_donors": [
+                      {
+                        "failure_prob": 0.1,
+                        "score": 50.88,
+                        "donor": "3000"
+                      },
+                      {
+                        "failure_prob": 0.5,
+                        "score": 74.11,
+                        "donor": "3002"
+                      },
+                      {
+                        "failure_prob": 0.5,
+                        "score": 68.23,
+                        "donor": "3006"
+                      }
+                    ]
+                  }
+                }
+              }
+          
+  /resum/{id}:
+    x-summary: Col·lecció de resums dels objectes.
+    get:
+      description: Informació relativa a l'objecte.
+      summary: Obté el resum.
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Identificador de l'objecte. En aquest cas HashCode.
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Resum'
+          examples:
+            application/json:
+              {
+                "origin": "TESTS",
+                "description": "Fitxer arcs5.json. Arc de prova amb només 5 receptors i les dades mínimes per provar la aplicació. Els id dels donants altruistes es correspoan amb el codi 1xxx, els receptors amb el codi 2xxx i els donants associats amb el codi 3xxx",
+                "altruists": ["1000", "1001"]
+              }
+  /cadena-trasplantaments:
+    x-summary: Col·lecció de cadenes de trasplantaments.
+    post:
+      description: >-
+        Crea l'objecte que genera les cadenes de trasplantament.
+      summary: Crea un OptimitzadorTransplants
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: file
+          in: formData
+          description: Fitxer JSON que conté el graf.
+          required: true
+          type: file
+      responses:
+        201:
+          description: "L'objecte s'ha creat correctament."
+          schema:
+            type: object
+            properties:
+              files:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    hash:
+                      type: integer
+                    
+  /cadena-trasplantaments/{id}:
+    x-summary: Col·lecció de cadenes de trasplantaments.
+    put:
+      description: >-
+        Obté una cadena de transplantaments donat una sèrie de paràmetres i amb les dades que té l'objecte.
+      summary: Obté una cadena de trasplantament
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Identificador de l'objecte. En aquest cas HashCode.
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CadenaRequest'
+      responses:
+        200:
+          description: Successful Response
+          schema: 
+            $ref: '#/definitions/Cadena'
+            
+          examples:
+            application/json:
+                - donant: "1001"
+                  probExit: 0.8
+                  receptor: "2002"
+                  valor: 220.22527033474998
+                - donant: "3003"
+                  probExit: 0.9
+                  receptor: "2000"
+                  valor: 207.38435
+                - donant: "3002"
+                  probExit: 0.9
+                  receptor: "2000"
+                  valor: 207.38435
+                - donant: "3000"
+                  probExit: 0.9
+                  receptor: "2004"
+                  valor: 88.949
+                - donant: "3007"
+                  probExit: 0.8
+                  receptor: "2003"
+                  valor: 44.55
+definitions:
+  DonantCompatible:
+    title: Dades d'un donant compatible.
+    type: object
+    properties:
+      failure_prob:
+        type: number
+        format: float
+      score:
+        type: number
+        format: float
+      donor:
+        type: string  
+
+  Pacient:
+    title: Dades d'un pacient.
+    type: object
+    properties:
+      related_donors:
+        type: array
+        items:
+          type: string
+      compatible_donors:
+        type: array
+        items:
+          $ref: '#/definitions/DonantCompatible'
+
+  Altruistes:
+    title: Identificadors dels altruistes
+    type: array
+    items:
+      type: string
+    
+  Fitxer:
+    title: Graf de compatibilitats en format JSON.
+    type: object
+    properties:
+      origin:
+        type: string
+      description:
+        type: string
+      altruists:
+        $ref: '#/definitions/Altruistes'
+      patients:
+        $ref: '#/definitions/Pacient'
+      
+  Cadena:
+    title: Cadena de trasplantaments
+    type: array
+    items:
+      $ref: '#/definitions/Trasplantament'
+          
+  Resum:
+    title: Resum d'un objecte
+    type: object
+    properties:
+      origin:
+        type: string
+      description:
+        type: string
+      altruists:
+        $ref: '#/definitions/Altruistes'
+        
+  Trasplantament:
+    title: Dades d'un trasplantament
+    type: object
+    properties:
+      donant:
+        type: string
+      probExit:
+        type: number
+        format: float
+      receptor:
+        type: string
+      valor:
+        type: number
+        format: float
+    example:
+      donant: "1001"
+      probExit: 0.8
+      receptor: "2002"
+      valor: 220.22527033474998
+      
+  CadenaRequest:
+    title: Dades necesaries per obtenir una cadena de trasplantaments
+    type: object
+    properties:
+      id:
+        type: string
+      profunditat:
+        type: integer
+        format: int32
+      pacient:
+        type: string
+      donantsIgnorats:
+        type: array
+        items:
+          type: string
+      receptorsIgnorats:
+        type: array
+        items:
+          type: string
+      provesEncreuades:
+        type: array
+        items:
+          type: string
+      ignorarFallada:
+        type: boolean
+    required:
+      - profunditat
+      - pacient
