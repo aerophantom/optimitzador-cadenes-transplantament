@@ -403,6 +403,7 @@ export default class TransplantOptimizer{
         this._IgnoredDonors = [];
         this._IgnoredRecipients = [];
         this._IgnoreFailureProbability = kwargs.ignoreFailureProbability || false;
+        this._Log.crossed_tests = kwargs.crossedTests || false;
 
         this.inicialitzarReceptors(kwargs);
         this.inicialitzarDonants(kwargs);
@@ -425,7 +426,6 @@ export default class TransplantOptimizer{
                 );
             }
 
-            this._Log.crossed_tests = [];
             // Llista d'elements de S ordenats incrementalment pel seu val.
             let T = TransplantOptimizer.obtenirConjuntOrdenatPerValor(S, val);
             no_more_transplantations = true;
@@ -444,9 +444,6 @@ export default class TransplantOptimizer{
                     // Si el resultat de la prova és positiu no es pot fer el
                     // trasplantament
                     this.eliminarDonantCompatibleDeReceptor(donant, receptor);
-                    this._Log.crossed_tests.push(
-                        {"donor": donant, "receiver": receptor}
-                    );
                     continue;
 
                 } else {
@@ -598,8 +595,8 @@ export default class TransplantOptimizer{
      * @returns {string}
      */
     get log(){
-        let logAsText =  ">LOG: {}\n".format(Utils.currentDateTime);
-        logAsText += ">HASH FITXER ORIGINAL: {}\n".format(this.hashCode);
+        let logAsText =  ">DATE\n{}\n".format(Utils.currentDateTime);
+        logAsText += ">HASH FITXER ORIGINAL\n{}\n".format(this.hashCode);
         logAsText += ">TRASPLANTAMENTS:\n";
         logAsText += "DONANT;RECEPTOR;PROBABILITAT_EXIT;VALOR\n";
 
@@ -614,13 +611,13 @@ export default class TransplantOptimizer{
         if(this._IgnoreFailureProbability){
             ignoraProabilitat = "cert";
         }
-        logAsText += ">>IGNORAR PROBABILITAT FALLADA: {}\n".format(
+        logAsText += ">>IGNORAR PROBABILITAT FALLADA\n{}\n".format(
             ignoraProabilitat
         );
-        logAsText += ">>LLARGADA DE LA CADENA: {}\n".format(
+        logAsText += ">>LLARGADA DE LA CADENA\n{}\n".format(
             this._ChainLength.toString()
         )
-        logAsText += ">>PROFUNDITAT: {}\n".format(
+        logAsText += ">>PROFUNDITAT\n{}\n".format(
             this._Depth.toString()
         );
         logAsText += ">>DONANTS IGNORATS\n";
@@ -633,11 +630,11 @@ export default class TransplantOptimizer{
         }
 
         logAsText += ">>POSITIUS PROVES CREUADES\n";
-        logAsText += "DONANT;RECEPTOR\n";
-        for(const positive of this._Log.crossed_tests){
-            logAsText += "{};{}\n".format(positive.donor, positive.receiver);
+        logAsText += "RECEPTOR;DONANT\n";
+        for(let positive of this._Log.crossed_tests){
+            logAsText += "{}\n".format(positive.replace("-",";"));
         }
-        logAsText += "\nTime elapsed: {} s".format(this._secondsElapsed);
+        logAsText += ">Time elapsed\ntime;magnitude\n{};s\n".format(this._secondsElapsed);
         return logAsText;
     }
 
@@ -692,7 +689,9 @@ export default class TransplantOptimizer{
                 if(llistatDonantsIgnoratsExtended.includes(compatible_donor.donor)){
                     compatible_donors_to_remove.push(index);
                 }
-                index += 1;
+                else{
+                    index += 1;
+                }
             }
             for(const compatible_donor_to_remove of compatible_donors_to_remove){
                 compatible_donors.splice(compatible_donor_to_remove, 1);
