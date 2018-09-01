@@ -637,6 +637,7 @@ export default class TransplantOptimizer{
             logAsText += "{}\n".format(positive.replace("-",";"));
         }
         logAsText += ">Time elapsed\ntime;magnitude\n{};s\n".format(this._secondsElapsed);
+        console.log(logAsText);
         return logAsText;
     }
 
